@@ -1,0 +1,12 @@
+.git
+.vercel
+node_modules
+dist
+.vite
+.env
+.env.*
+*.local
+playwright-report
+test-results
+docs
+README.md
