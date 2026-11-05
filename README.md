@@ -35,9 +35,10 @@ See [the deployment guide](docs/DEPLOYMENT.md) for exact settings and verificati
 
 - `src/eventData.js` contains the official Notion registration URL, schools, module descriptions, FAQs, and planned dates. Update it when CURSOR confirms changes.
 - `src/App.jsx` contains the page structure and interactions. Suggested skills on role cards are illustrative; final assignments and prerequisites belong to CURSOR.
-- `src/styles.css` contains the responsive design tokens and styling.
-- `src/ParticleField.jsx` creates the original, locally rendered spectral artwork. It pauses when offscreen or hidden, respects reduced-motion settings, and has a visible pause control.
-- `public/cursor-logo.png` is extracted from the supplied event document. Its source resolution is small; replace it with an official high-resolution logo when available.
+- `src/styles.css` contains the base responsive styles; `src/redesign.css` defines the cinematic brand treatment, animated atmospheric layers, section reveals, and interactive surfaces.
+- `src/LogoParticles.jsx` samples the actual DAGITAB logo into a spring-based particle system. Particles assemble into the logo, respond to pointer movement and taps, and reform. Replay and global pause controls are available; offscreen/hidden tabs suspend rendering and reduced-motion preferences show a static logo immediately.
+- `public/brand/dagitab-logo.svg` is the authoritative event logo uploaded by the user. Only its oversized transparent viewport is trimmed for consistent display; the embedded high-resolution silver artwork, colors, and original transforms are preserved. This same SVG appears in the header/footer and supplies the particle formation mask.
+- `public/organizations/` contains the original CURSOR and BatStateU marks extracted from the supplied event document. Their source resolution is small, so they are displayed at modest sizes. The other student communities are identified by name until their original image files are available; no replacement marks are invented.
 - `public/dagitab-event-brief.pdf` is the user-supplied source document.
 - Fonts are bundled locally through Fontsource. No third-party moodboard images are used.
 
@@ -58,7 +59,8 @@ Production compilation and Chromium desktop/mobile checks are used to validate t
 - FAQ expansion and collapse.
 - Mobile menu navigation and Escape dismissal.
 - Official registration links and downloadable PDF.
-- Pause/resume and reduced-motion rendering.
+- Visible logo formation, pointer/tap scattering, replay, global pause/resume, and reduced-motion rendering.
+- Scroll-triggered section reveals, animated system connections, and page progress.
 - Responsive page widths from 320px to 1440px.
 
 Check the external form and confirm the published schedule with CURSOR before launching the site publicly.

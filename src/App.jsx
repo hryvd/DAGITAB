@@ -23,15 +23,11 @@ import {
   ExternalLink,
   Pause,
   Play,
+  RotateCcw,
+  MousePointer2,
 } from 'lucide-react';
-import ParticleField from './ParticleField';
-import {
-  REGISTRATION_URL,
-  programStages,
-  modules,
-  faqs,
-  schools,
-} from './eventData';
+import LogoParticles from './LogoParticles';
+import { REGISTRATION_URL, programStages, modules, faqs } from './eventData';
 
 const icons = {
   Network,
@@ -111,6 +107,28 @@ function Header() {
   const toggleRef = useRef(null);
   const mobileNavRef = useRef(null);
   const menuId = useId();
+  const [activeSection, setActiveSection] = useState('');
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting)
+            setActiveSection(
+              entry.target.matches('.hero') ? '' : `#${entry.target.id}`,
+            );
+        });
+      },
+      { rootMargin: '-12% 0px -58% 0px', threshold: 0 },
+    );
+    const hero = document.querySelector('.hero');
+    if (hero) observer.observe(hero);
+    navigation.forEach(([, href]) => {
+      const section = document.querySelector(href);
+      if (section) observer.observe(section);
+    });
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (event) => {
@@ -136,16 +154,26 @@ function Header() {
 
   return (
     <header className="site-header">
+      <div className="reading-progress" aria-hidden="true" />
       <div className="nav-wrap container">
         <a className="brand" href="#top" aria-label="DAGITAB home">
-          <Spark />
-          <span>
-            DAGITAB<span className="brand-sub">A CURSOR INITIATIVE</span>
-          </span>
+          <img
+            className="brand-logo"
+            src="/brand/dagitab-logo.svg"
+            alt="DAGITAB"
+            width="124"
+            height="46"
+          />
+          <span className="brand-sub">A CURSOR INITIATIVE</span>
         </a>
         <nav className="desktop-nav" aria-label="Main navigation">
           {navigation.map(([label, href]) => (
-            <a key={href} href={href}>
+            <a
+              key={href}
+              href={href}
+              className={activeSection === href ? 'is-active' : undefined}
+              aria-current={activeSection === href ? 'location' : undefined}
+            >
               {label}
             </a>
           ))}
@@ -174,7 +202,13 @@ function Header() {
           aria-label="Mobile navigation"
         >
           {navigation.map(([label, href]) => (
-            <a key={href} href={href} onClick={() => setMenuOpen(false)}>
+            <a
+              key={href}
+              href={href}
+              className={activeSection === href ? 'is-active' : undefined}
+              aria-current={activeSection === href ? 'location' : undefined}
+              onClick={() => setMenuOpen(false)}
+            >
               {label}
               <ArrowUpRight size={18} />
             </a>
@@ -186,45 +220,73 @@ function Header() {
   );
 }
 
-function Hero() {
-  const [paused, setPaused] = useState(false);
+function SignalTicker() {
+  const words = [
+    'DIGITAL BAYANIHAN',
+    'MANY MINDS. ONE PLATFORM.',
+    'BUILT FOR BATANGAS',
+    'YOUR NEXT COLLECTIVE BUILD',
+  ];
+  return (
+    <div className="signal-ticker" aria-hidden="true">
+      <div className="ticker-track">
+        {[0, 1].map((copy) => (
+          <div className="ticker-group" key={copy}>
+            {words.map((word) => (
+              <span key={word}>
+                <Spark />
+                {word}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Hero({ paused, onToggleMotion }) {
+  const [replayKey, setReplayKey] = useState(0);
   return (
     <>
-      <section className="hero" aria-labelledby="hero-title">
-        <ParticleField paused={paused} />
-        <div className="hero-shade" />
+      <section className="hero hero-v2" aria-labelledby="hero-title">
+        <div className="hero-atmosphere" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <div className="horizon-grid" />
+        </div>
         <div className="container hero-content">
           <div className="hero-eyebrow">
             <p>
               <span className="status-dot" />
-              CALLING THE NEXT WAVE OF STUDENT BUILDERS
+              CPET BISEG · DIGITAL BAYANIHAN
             </p>
-            <span>CPET BISEG / 2026—2027</span>
+            <span>2026—2027 / BATANGAS, PH</span>
           </div>
           <div className="hero-title-wrap">
-            <h1 id="hero-title">
+            <h1 className="sr-only" id="hero-title">
               DAGITAB
-              <span className="title-spark">
-                <Spark />
-              </span>
             </h1>
-            <p className="hero-expansion">
+            <div className="logo-stage">
+              <LogoParticles paused={paused} replayKey={replayKey} />
+            </div>
+            <p className="hero-logo-caption">
               BUILDING INTEGRATED SYSTEMS FOR E-GOVERNANCE
             </p>
           </div>
           <div className="hero-copy">
             <div className="theme-tag">
-              <span />
-              DIGITAL BAYANIHAN
+              <span />A COLLABORATIVE BUILD. A COLLECTIVE IMPACT.
             </div>
             <h2>
-              Your code.
+              One spark.
               <br />
-              Our city’s future.
+              <span>A city of possibilities.</span>
             </h2>
             <p>
-              Different schools. One shared mission. Build the next chapter of
-              e-governance for Batangas City, together.
+              Cross campuses. Connect ideas. Build one e-governance platform for
+              Batangas City—with a community that moves forward together.
             </p>
             <div className="hero-buttons">
               <JoinLink />
@@ -234,14 +296,32 @@ function Hero() {
               </a>
             </div>
           </div>
-          <div className="orbit-caption" aria-hidden="true">
-            <span className="orbit-cross">+</span>
-            <span>
-              SMALL SPARKS.
-              <br />
-              COLLECTIVE IMPACT.
+          <div className="hero-controls">
+            <span className="interaction-hint">
+              <MousePointer2 size={13} />
+              Move or tap the logo to explore.
             </span>
-            <span className="orbit-cross">+</span>
+            <button
+              className="replay-button"
+              onClick={() => {
+                if (paused) onToggleMotion();
+                setReplayKey((key) => key + 1);
+              }}
+            >
+              <RotateCcw size={13} />
+              Replay formation
+            </button>
+            <button
+              className="motion-toggle"
+              onClick={onToggleMotion}
+              aria-label={
+                paused ? 'Play particle animation' : 'Pause particle animation'
+              }
+              aria-pressed={paused}
+            >
+              {paused ? <Play size={13} /> : <Pause size={13} />}
+              <span>{paused ? 'Play motion' : 'Pause motion'}</span>
+            </button>
           </div>
           <div className="hero-bottom">
             <div className="hero-details">
@@ -258,60 +338,87 @@ function Hero() {
                 FOR BATANGAS CITY
               </span>
             </div>
-            <button
-              className="motion-toggle"
-              onClick={() => setPaused(!paused)}
-              aria-label={
-                paused ? 'Play particle animation' : 'Pause particle animation'
-              }
-              aria-pressed={paused}
-            >
-              {paused ? <Play size={13} /> : <Pause size={13} />}
-              <span>{paused ? 'Play motion' : 'Pause motion'}</span>
-            </button>
+            <a className="scroll-cue" href="#about">
+              EXPLORE THE COLLECTIVE
+              <ArrowDown size={14} />
+            </a>
           </div>
         </div>
       </section>
-      <section
-        className="campuses"
-        aria-label="Calling students from these schools"
-      >
-        <div className="container campus-row">
-          <p className="campus-kicker">
-            DIFFERENT CAMPUSES.
-            <br />
-            <span>ONE COLLECTIVE SPARK.</span>
-          </p>
-          <div className="campus-name">
-            <span className="campus-monogram">
-              B<span>S</span>U
-            </span>
-            <p>
-              {schools[0]}
-              <small>THE NATIONAL ENGINEERING UNIVERSITY</small>
-            </p>
-          </div>
-          <div className="campus-name">
-            <span className="campus-wordmark">
-              LPU<span>BATANGAS</span>
-            </span>
-            <p>
-              Lyceum of the Philippines
-              <br />
-              University–Batangas
-            </p>
-          </div>
-          <div className="campus-name">
-            <span className="ub-monogram">UB</span>
-            <p>
-              University of
-              <br />
-              Batangas
-            </p>
-          </div>
-        </div>
-      </section>
+      <SignalTicker />
     </>
+  );
+}
+
+const organizations = [
+  {
+    name: 'CURSOR',
+    role: 'HOST ORGANIZATION',
+    logo: '/organizations/cursor.png',
+    detail: 'Computer Engineering Students Organization · BatStateU',
+  },
+  {
+    name: 'Batangas State University',
+    role: 'HOST UNIVERSITY',
+    logo: '/organizations/batstateu.png',
+    detail: 'The National Engineering University',
+  },
+  {
+    name: 'LPU Batangas',
+    role: 'STUDENT COMMUNITY',
+    wordmark: 'Microsoft Student Community',
+    detail: 'Lyceum of the Philippines University–Batangas',
+  },
+  {
+    name: 'University of Batangas',
+    role: 'STUDENT COMMUNITY',
+    wordmark: 'Computer Engineering Students’ Society',
+    detail: 'Connecting student builders across campuses',
+  },
+];
+
+function Organizations() {
+  return (
+    <section
+      className="organization-section"
+      aria-labelledby="organization-title"
+    >
+      <div className="container">
+        <div className="organization-heading">
+          <p className="section-label">THE COMMUNITY BEHIND THE BUILD</p>
+          <h2 id="organization-title">
+            Different campuses.
+            <br />
+            <span className="muted">One collective spark.</span>
+          </h2>
+        </div>
+        <div className="organization-grid">
+          {organizations.map((item) => (
+            <article
+              className={`organization-card ${item.role === 'HOST ORGANIZATION' ? 'host-organization' : ''}`}
+              key={item.name}
+            >
+              <p className="organization-role">{item.role}</p>
+              {item.logo ? (
+                <img
+                  className="organization-logo"
+                  src={item.logo}
+                  alt={`${item.name} logo`}
+                  width="98"
+                  height="92"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div className="organization-wordmark">{item.wordmark}</div>
+              )}
+              <h3>{item.name}</h3>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -551,6 +658,18 @@ function Modules() {
             return (
               <button
                 className="module-card"
+                onPointerMove={(event) => {
+                  if (event.pointerType === 'touch') return;
+                  const bounds = event.currentTarget.getBoundingClientRect();
+                  event.currentTarget.style.setProperty(
+                    '--spot-x',
+                    `${((event.clientX - bounds.left) / bounds.width) * 100}%`,
+                  );
+                  event.currentTarget.style.setProperty(
+                    '--spot-y',
+                    `${((event.clientY - bounds.top) / bounds.height) * 100}%`,
+                  );
+                }}
                 key={item.title}
                 onClick={() => setActiveRole(index)}
                 aria-haspopup="dialog"
@@ -888,10 +1007,14 @@ function Footer() {
       <div className="container">
         <div className="footer-top">
           <a className="brand" href="#top">
-            <Spark />
-            <span>
-              DAGITAB<span className="brand-sub">DIGITAL BAYANIHAN</span>
-            </span>
+            <img
+              className="brand-logo"
+              src="/brand/dagitab-logo.svg"
+              alt="DAGITAB"
+              width="160"
+              height="60"
+            />
+            <span className="brand-sub">DIGITAL BAYANIHAN</span>
           </a>
           <p>
             Made of many minds.
@@ -906,7 +1029,7 @@ function Footer() {
         <div className="organizer-row">
           <div className="organizer-identity">
             <img
-              src="/cursor-logo.png"
+              src="/organizations/cursor.png"
               alt="CURSOR BatStateU TNEU crest"
               width="35"
               height="50"
@@ -942,7 +1065,77 @@ function Footer() {
   );
 }
 
+function usePageMotion(paused) {
+  useEffect(() => {
+    document.body.classList.toggle('motion-paused', paused);
+    return () => document.body.classList.remove('motion-paused');
+  }, [paused]);
+
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let observer;
+    const elements = document.querySelectorAll(
+      '.organization-heading, .organization-card, .section-label, .about-grid, .impact-strip, .module-card, .experience-card, .section-heading-row, .roadmap-tabs, .roadmap-list, .faq-grid, .join-card',
+    );
+    function initReveals() {
+      observer?.disconnect();
+      document.body.classList.remove('has-reveal');
+      if (reduced.matches || !('IntersectionObserver' in window)) {
+        elements.forEach((element) => element.classList.add('is-visible'));
+        return;
+      }
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.06, rootMargin: '0px 0px -20px 0px' },
+      );
+      elements.forEach((element, index) => {
+        element.classList.add('reveal');
+        element.style.setProperty(
+          '--reveal-delay',
+          `${element.classList.contains('module-card') ? (index % 4) * 55 : 0}ms`,
+        );
+        observer.observe(element);
+      });
+      document.body.classList.add('has-reveal');
+    }
+    initReveals();
+    reduced.addEventListener('change', initReveals);
+    let frame = 0;
+    function updateProgress() {
+      frame = 0;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      document.documentElement.style.setProperty(
+        '--page-progress',
+        total > 0 ? String(window.scrollY / total) : '0',
+      );
+    }
+    function onScroll() {
+      if (!frame) frame = requestAnimationFrame(updateProgress);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    updateProgress();
+    return () => {
+      observer?.disconnect();
+      reduced.removeEventListener('change', initReveals);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      cancelAnimationFrame(frame);
+      document.body.classList.remove('has-reveal');
+      document.documentElement.style.removeProperty('--page-progress');
+    };
+  }, []);
+}
+
 export default function App() {
+  const [paused, setPaused] = useState(false);
+  usePageMotion(paused);
   return (
     <>
       <a className="skip-link" href="#main">
@@ -951,7 +1144,11 @@ export default function App() {
       <div id="top" />
       <Header />
       <main id="main">
-        <Hero />
+        <Hero
+          paused={paused}
+          onToggleMotion={() => setPaused((value) => !value)}
+        />
+        <Organizations />
         <About />
         <Modules />
         <Experience />
