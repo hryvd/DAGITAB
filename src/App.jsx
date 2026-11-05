@@ -257,13 +257,6 @@ function Hero({ paused, onToggleMotion }) {
           <div className="horizon-grid" />
         </div>
         <div className="container hero-content">
-          <div className="hero-eyebrow">
-            <p>
-              <span className="status-dot" />
-              CPET BISEG · DIGITAL BAYANIHAN
-            </p>
-            <span>2026—2027 / BATANGAS, PH</span>
-          </div>
           <div className="hero-title-wrap">
             <h1 className="sr-only" id="hero-title">
               DAGITAB
