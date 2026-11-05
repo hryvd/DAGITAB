@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 const panes = [
   '.nav-wrap',
@@ -65,9 +65,22 @@ function edgeMap(width, height, radius) {
 export default function GlassRefraction() {
   const definitions = useRef(null);
   const prefix = `glass-${useId().replace(/[^a-zA-Z0-9-]/g, '')}`;
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
     if (!CSS.supports('backdrop-filter', 'url("#glass")')) return;
+    // Touch browsers use native frosting; SVG backdrop URLs are not portable.
+    const desktop = window.matchMedia(
+      '(min-width: 901px) and (hover: hover) and (pointer: fine)',
+    );
+    const update = () => setEnabled(desktop.matches);
+    update();
+    desktop.addEventListener('change', update);
+    return () => desktop.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
     const defs = definitions.current;
     const tracked = new Map();
     const filters = new Map();
@@ -165,7 +178,7 @@ export default function GlassRefraction() {
       }
       defs.replaceChildren();
     };
-  }, [prefix]);
+  }, [prefix, enabled]);
 
   return (
     <svg

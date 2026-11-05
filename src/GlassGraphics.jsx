@@ -18,6 +18,14 @@ export function GlassBackdrop() {
           <stop offset="1" stopColor="#a6bfd5" stopOpacity="0" />
         </linearGradient>
       </defs>
+      <path
+        className="glass-light-beam"
+        d="M-80 580L1080 40"
+        fill="none"
+        stroke={`url(#${id}-line)`}
+        strokeWidth="110"
+        opacity=".12"
+      />
       <g fill="none" stroke={`url(#${id}-line)`} strokeWidth=".7">
         <path
           d="M-80 160H1080M-80 430H1080M180-80V680M780-80V680"

@@ -1,0 +1,271 @@
+/* Phone layouts keep content readable without changing the desktop composition. */
+@media (max-width: 600px) {
+  .section,
+  .organization-section {
+    padding-block: 56px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    margin-bottom: 24px;
+  }
+
+  .organization-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .organization-heading .eyebrow {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.7;
+  }
+
+  .organization-heading h2,
+  .section-heading-row h2,
+  .modules-section h2,
+  .about-grid h2,
+  .faq-grid h2 {
+    font-size: clamp(32px, 8.5vw, 38px);
+    line-height: 1.14;
+    letter-spacing: -1.4px;
+  }
+
+  .section-heading-row > p,
+  .about-grid > div > p {
+    max-width: none;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .organization-card h3 {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .organization-card > p:not(.organization-role) {
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .organization-card .organization-role {
+    font-size: 9px;
+  }
+
+  .module-card {
+    min-height: 0;
+    padding: 24px 22px;
+  }
+
+  .module-card-top {
+    margin-bottom: 16px;
+  }
+
+  .module-card h3,
+  .module-card:first-of-type h3 {
+    font-size: 23px;
+    line-height: 1.3;
+  }
+
+  .module-description,
+  .experience-card > p,
+  .faq-item [role='region'] > p {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .module-card-bottom {
+    margin-top: 20px;
+    font-size: 12px;
+  }
+
+  .section-footnote {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .experience-card {
+    display: block;
+  }
+
+  .experience-art {
+    height: auto;
+    aspect-ratio: 7 / 4;
+    margin-bottom: 20px;
+  }
+
+  .experience-card > .tiny-label {
+    display: block;
+    font-size: 10px;
+    margin: 0 0 10px;
+    line-height: 1.6;
+  }
+
+  .experience-card h3 {
+    font-size: 25px;
+    line-height: 1.25;
+    margin: 0 0 12px;
+  }
+
+  .experience-card > p {
+    max-width: none;
+  }
+
+  .roadmap-stage {
+    grid-template-columns: 28px minmax(0, 1fr);
+    column-gap: 12px;
+  }
+
+  .stage-number {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+  }
+
+  .stage-main h3 {
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .stage-main p {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .stage-date {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .text-link,
+  .footer-bottom > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-block: 10px;
+  }
+
+  .hero.hero-v2 {
+    min-height: 0;
+  }
+
+  .hero.hero-v2 .hero-bottom .scroll-cue {
+    min-height: 44px;
+    padding-block: 10px;
+    font-size: 9px;
+    letter-spacing: 1.25px;
+  }
+
+  .site-footer .brand {
+    min-height: 44px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .footer-bottom > a {
+    font-size: 12px;
+  }
+
+  .organizer-identity p,
+  .sdg-note {
+    font-size: 10px;
+  }
+
+  .organizer-identity strong {
+    font-size: 13px;
+  }
+
+  .organizer-identity p > span {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .sdg-note > span {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+}
+
+@media (max-width: 420px) {
+  .organization-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .organization-card {
+    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-rows: 18px auto auto;
+    grid-template-areas:
+      'logo role'
+      'logo name'
+      'logo detail';
+    gap: 6px 14px;
+    align-content: center;
+    justify-items: start;
+    min-height: 174px;
+    padding: 18px 16px;
+  }
+
+  .organization-card .organization-logo-stage {
+    grid-area: logo;
+    width: 96px;
+    height: 112px;
+    align-self: center;
+    --logo-scale: 0.82;
+  }
+
+  .organization-card .organization-logo--lpu {
+    width: 96px;
+    height: 70px;
+  }
+
+  .organization-card .organization-role {
+    grid-area: role;
+    letter-spacing: 0.5px;
+  }
+
+  .organization-card h3 {
+    grid-area: name;
+    font-size: 15px;
+  }
+
+  .organization-card > p:not(.organization-role) {
+    grid-area: detail;
+  }
+
+  .organization-card h3,
+  .organization-card > p {
+    text-align: left;
+  }
+
+  .hero-v2 .hero-details {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .hero-v2 .hero-details > span {
+    white-space: nowrap;
+    font-size: 11px;
+  }
+
+  .hero-v2 .hero-details > span:last-child {
+    grid-column: auto;
+  }
+
+  .roadmap-tabs button {
+    font-size: 11px;
+    padding-inline: 6px;
+    white-space: nowrap;
+  }
+
+  .roadmap-tabs button > svg {
+    display: none;
+  }
+}

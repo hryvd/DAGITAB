@@ -1,0 +1,92 @@
+/* A black sky stays behind every section and every glass surface. */
+#root {
+  isolation: isolate;
+  background: #000;
+}
+
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+#root main,
+#root .site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+#root main,
+#root main > section,
+#root .hero.hero-v2,
+#root .signal-ticker,
+#root .site-footer {
+  background-color: transparent;
+  background-image: none;
+}
+
+.background-star {
+  position: absolute;
+  border-radius: 50%;
+  color: #d8c7ff;
+  background: #f4efff;
+  box-shadow:
+    0 0 5px 1px rgb(232 218 255 / 65%),
+    0 0 14px 2px rgb(181 148 255 / 28%);
+  opacity: 0.22;
+  animation: background-star-twinkle ease-in-out infinite;
+}
+
+.background-star:nth-child(3n) {
+  color: #e5f1ff;
+  background: #f4f8ff;
+}
+
+.background-star--glint::before,
+.background-star--glint::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+
+.background-star--glint::before {
+  width: 1px;
+  height: 8px;
+}
+
+.background-star--glint::after {
+  width: 8px;
+  height: 1px;
+}
+
+@keyframes background-star-twinkle {
+  0%,
+  100% {
+    opacity: 0.14;
+    transform: scale(0.8);
+  }
+  48% {
+    opacity: 0.95;
+    transform: scale(1.12);
+  }
+}
+
+@media (max-width: 600px) {
+  .background-star:nth-child(n + 41) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .background-star {
+    animation: none;
+    opacity: 0.32;
+  }
+}

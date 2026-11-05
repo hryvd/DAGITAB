@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import LogoParticles from './LogoParticles';
 import GlassRefraction from './GlassRefraction';
+import Starfield from './Starfield';
 import { GlassBackdrop, ExperienceGraphic } from './GlassGraphics';
 import batstateuLogo from '../2.png';
 import cursorLogo from '../3.png';
@@ -111,6 +112,21 @@ function Header() {
   const menuId = useId();
   const [activeSection, setActiveSection] = useState('');
   useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 901px)');
+    const closeOnDesktop = () => {
+      if (desktop.matches) setMenuOpen(false);
+    };
+    const closeOnNavigation = () => setMenuOpen(false);
+    desktop.addEventListener('change', closeOnDesktop);
+    window.addEventListener('popstate', closeOnNavigation);
+    window.addEventListener('hashchange', closeOnNavigation);
+    return () => {
+      desktop.removeEventListener('change', closeOnDesktop);
+      window.removeEventListener('popstate', closeOnNavigation);
+      window.removeEventListener('hashchange', closeOnNavigation);
+    };
+  }, []);
+  useEffect(() => {
     if (!('IntersectionObserver' in window)) return;
     const observer = new IntersectionObserver(
       (entries) => {
@@ -154,11 +170,42 @@ function Header() {
     };
   }, [menuOpen]);
 
+  function navigateToSection(event, href) {
+    if (
+      event.button ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    event.preventDefault();
+    setMenuOpen(false);
+    setActiveSection(href);
+    if (window.location.hash !== href) window.history.pushState(null, '', href);
+    requestAnimationFrame(() => {
+      document.querySelector(href)?.scrollIntoView({
+        block: 'start',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth',
+      });
+    });
+  }
+
   return (
     <header className="site-header">
       <div className="reading-progress" aria-hidden="true" />
       <div className="nav-wrap container">
-        <a className="brand" href="#top" aria-label="DAGITAB home">
+        <a
+          className="brand"
+          href="#top"
+          aria-label="DAGITAB home"
+          onClick={() => {
+            setMenuOpen(false);
+            setActiveSection('');
+          }}
+        >
           <img
             className="brand-logo"
             src="/brand/dagitab-logo.svg"
@@ -185,12 +232,13 @@ function Header() {
             Let’s build
           </JoinLink>
           <button
+            type="button"
             ref={toggleRef}
             className="menu-toggle icon-button"
             aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={menuOpen}
             aria-controls={menuId}
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => setMenuOpen((open) => !open)}
           >
             {menuOpen ? <X /> : <Menu />}
           </button>
@@ -209,13 +257,16 @@ function Header() {
               href={href}
               className={activeSection === href ? 'is-active' : undefined}
               aria-current={activeSection === href ? 'location' : undefined}
-              onClick={() => setMenuOpen(false)}
+              onClick={(event) => navigateToSection(event, href)}
             >
               {label}
               <ArrowUpRight size={18} />
             </a>
           ))}
-          <JoinLink className="button button-lime" />
+          <JoinLink
+            className="button button-lime"
+            onClick={() => setMenuOpen(false)}
+          />
         </nav>
       )}
     </header>
@@ -1066,25 +1117,40 @@ function usePageMotion() {
     initReveals();
     reduced.addEventListener('change', initReveals);
     let frame = 0;
+    let disposed = false;
     function updateProgress() {
       frame = 0;
-      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const scroller = document.scrollingElement || document.documentElement;
+      const total = scroller.scrollHeight - scroller.clientHeight;
+      const progress = total > 0 ? scroller.scrollTop / total : 0;
       document.documentElement.style.setProperty(
         '--page-progress',
-        total > 0 ? String(window.scrollY / total) : '0',
+        String(Math.max(0, Math.min(1, progress))),
       );
     }
     function onScroll() {
-      if (!frame) frame = requestAnimationFrame(updateProgress);
+      if (!disposed && !frame) frame = requestAnimationFrame(updateProgress);
     }
+    const contentResize = new ResizeObserver(onScroll);
+    contentResize.observe(document.body);
+    contentResize.observe(document.documentElement);
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
+    window.addEventListener('pageshow', onScroll);
+    window.visualViewport?.addEventListener('resize', onScroll);
+    window.visualViewport?.addEventListener('scroll', onScroll);
+    document.fonts?.ready.then(onScroll);
     updateProgress();
     return () => {
+      disposed = true;
       observer?.disconnect();
+      contentResize.disconnect();
       reduced.removeEventListener('change', initReveals);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      window.removeEventListener('pageshow', onScroll);
+      window.visualViewport?.removeEventListener('resize', onScroll);
+      window.visualViewport?.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);
       document.body.classList.remove('has-reveal');
       document.documentElement.style.removeProperty('--page-progress');
@@ -1096,6 +1162,7 @@ export default function App() {
   usePageMotion();
   return (
     <>
+      <Starfield />
       <svg
         width="0"
         height="0"

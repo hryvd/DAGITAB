@@ -35,7 +35,9 @@ See [the deployment guide](docs/DEPLOYMENT.md) for exact settings and verificati
 
 - `src/eventData.js` contains the official Notion registration URL, schools, module descriptions, FAQs, and planned dates. Update it when CURSOR confirms changes.
 - `src/App.jsx` contains the page structure and interactions. Work areas and suggested skills are illustrative; the city’s priorities determine scope, while CURSOR confirms assignments and prerequisites.
-- `src/styles.css` contains base responsive styles; `src/redesign.css` defines the black/silver brand treatment, reveals, and layout. `src/liquid-glass.css` adds shared glass surfaces. `src/GlassRefraction.jsx` computes rounded-edge lens maps from each panel’s actual size and corner radius; clear centers remain undistorted and unsupported browsers retain native blur. Foreground text and logos remain sharp.
+- `src/styles.css` contains base styles; `src/redesign.css` defines the black/silver brand treatment and reveals. `src/mobile.css` provides readable phone layouts, while `src/navigation.css` keeps the mobile header fixed, respects safe areas, and bounds the menu to the viewport.
+- `src/liquid-glass.css` resolves glass highlights and fill on each panel. Phones and touch devices use native frosting with both standard and WebKit backdrop-filter properties. `src/GlassRefraction.jsx` progressively adds rounded-edge lens maps on compatible desktop pointers; clear centers, foreground text, and logos remain undistorted.
+- `src/Starfield.jsx` and `src/starfield.css` add a fixed decorative sky behind the whole site. Stars slowly brighten and dim, use fewer points on phones, and stay static for reduced motion. The base canvas remains black.
 - `src/GlassGraphics.jsx` provides original SVG service-city, community, and system illustrations, plus the straight-line underlays visible through glass cards. Page backgrounds remain pure black.
 - `src/LogoParticles.jsx` samples the actual DAGITAB logo into a spring-based particle system. Particles automatically assemble into the logo, respond to pointer movement and taps, and reform. Offscreen/hidden tabs suspend rendering and reduced-motion preferences show a static logo immediately.
 - `public/brand/dagitab-logo.svg` is the authoritative event logo uploaded by the user. Only its oversized transparent viewport is trimmed for consistent display; the embedded high-resolution silver artwork, colors, and original transforms are preserved. This same SVG appears in the header/footer and supplies the particle formation mask.
@@ -59,6 +61,7 @@ Production compilation and Chromium desktop/mobile checks are used to validate t
 - All three roadmap phases, with arrow-key, Home, and End navigation.
 - FAQ expansion and collapse.
 - Mobile menu navigation and Escape dismissal.
+- Touch navigation, safe-area header positioning, and reading progress after viewport or content-size changes.
 - Official registration links and downloadable PDF.
 - Automatic logo formation, pointer/tap scattering, offscreen suspension, and reduced-motion rendering.
 - Scroll-triggered section reveals, animated system connections, and page progress.

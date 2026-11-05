@@ -11,6 +11,9 @@ import App from './App.jsx';
 import './styles.css';
 import './redesign.css';
 import './liquid-glass.css';
+import './mobile.css';
+import './navigation.css';
+import './starfield.css';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
