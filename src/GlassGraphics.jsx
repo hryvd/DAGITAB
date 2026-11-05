@@ -2,7 +2,6 @@ import { useId } from 'react';
 
 export function GlassBackdrop() {
   const id = useId();
-
   return (
     <svg
       className="glass-backdrop"
@@ -12,73 +11,33 @@ export function GlassBackdrop() {
       focusable="false"
     >
       <defs>
-        <linearGradient id={`${id}-ribbon`} x1="0" y1="1" x2="1" y2="0">
-          <stop stopColor="#92a7ff" stopOpacity="0" />
-          <stop offset=".28" stopColor="#9ce5f4" stopOpacity=".32" />
-          <stop offset=".52" stopColor="#f0f9ff" stopOpacity=".72" />
-          <stop offset=".75" stopColor="#c1b6ff" stopOpacity=".3" />
-          <stop offset="1" stopColor="#b1dfff" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id={`${id}-contour`} x1="0" y1="0" x2="1" y2="1">
-          <stop stopColor="#d5c6ff" stopOpacity="0" />
-          <stop offset=".4" stopColor="#b6b2e9" stopOpacity=".32" />
-          <stop offset=".72" stopColor="#d6fcff" stopOpacity=".38" />
-          <stop offset="1" stopColor="#b8dbff" stopOpacity="0" />
+        <linearGradient id={`${id}-line`} x1="0" y1="1" x2="1" y2="0">
+          <stop stopColor="#b8b5d7" stopOpacity="0" />
+          <stop offset=".3" stopColor="#c2dce8" stopOpacity=".25" />
+          <stop offset=".6" stopColor="#eaf5ff" stopOpacity=".55" />
+          <stop offset="1" stopColor="#a6bfd5" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <g fill="none" stroke={`url(#${id}-ribbon)`}>
+      <g fill="none" stroke={`url(#${id}-line)`} strokeWidth=".7">
         <path
-          d="M-120 610C230 580 155 292 482 314S744 43 1120 40"
-          strokeWidth="20"
-          opacity=".13"
+          d="M-80 160H1080M-80 430H1080M180-80V680M780-80V680"
+          opacity=".5"
         />
-        <path
-          d="M-120 598C230 568 155 280 482 302S744 31 1120 28"
-          strokeWidth="1.2"
-        />
-        <path
-          d="M-120 610C230 580 155 292 482 314S744 43 1120 40"
-          strokeWidth=".6"
-          opacity=".75"
-        />
-        <path
-          d="M-120 621C230 591 155 303 482 325S744 54 1120 51"
-          strokeWidth=".6"
-          opacity=".35"
-        />
+        <path d="M-80 580L1080 40" strokeWidth="1.2" />
+        <path d="M-80 592L1080 52" strokeWidth=".5" opacity=".4" />
       </g>
-      <g fill="none" stroke={`url(#${id}-contour)`}>
-        <ellipse
-          cx="480"
-          cy="324"
-          rx="533"
-          ry="170"
-          transform="rotate(26 480 324)"
-        />
-        <ellipse
-          cx="480"
-          cy="324"
-          rx="552"
-          ry="184"
-          transform="rotate(26 480 324)"
-          opacity=".38"
-        />
-        <path
-          d="M52-70C525 86 395 520 1077 640"
-          strokeWidth=".7"
-          opacity=".65"
-        />
-      </g>
-      <g fill="#d9faff" className="graphic-pulse">
-        <circle cx="268" cy="402" r="2.2" />
-        <circle cx="718" cy="198" r="2" />
-        <circle cx="881" cy="71" r="1.4" />
-        <circle cx="555" cy="447" r="1.4" opacity=".5" />
-      </g>
-      <g fill="none" stroke="#d7edff" strokeWidth=".6" opacity=".55">
-        <path d="M263 402h10m-5-5v10M713 198h10m-5-5v10" />
-        <circle cx="268" cy="402" r="7" opacity=".25" />
-        <circle cx="718" cy="198" r="7" opacity=".25" />
+      <path
+        className="graphic-flow"
+        d="M-80 580L1080 40"
+        fill="none"
+        stroke="#d3edff"
+        strokeWidth="2"
+        strokeDasharray="2 196"
+        opacity=".45"
+      />
+      <g fill="#d5edfb" className="graphic-pulse">
+        <circle cx="180" cy="160" r="1.7" />
+        <circle cx="780" cy="430" r="1.7" />
       </g>
     </svg>
   );

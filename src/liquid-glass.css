@@ -23,10 +23,6 @@
     0 14px 40px rgb(0 0 0 / 24%);
 }
 
-html.has-glass-refraction {
-  --liquid-backdrop: url('#liquid-refraction') blur(2px) saturate(1.35);
-}
-
 .site-header {
   background: transparent;
 }
@@ -92,10 +88,14 @@ html.has-glass-refraction {
 
 .organization-card {
   position: relative;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 280px;
-  padding: 28px 22px 25px;
+  display: grid;
+  grid-template-rows: 18px 128px 42px minmax(52px, auto);
+  gap: 10px;
+  align-content: start;
+  align-items: start;
+  justify-items: center;
+  min-height: 0;
+  padding: 24px 22px;
   text-align: center;
   --liquid-fill: rgb(4 5 7 / 44%);
   transition:
@@ -108,36 +108,61 @@ html.has-glass-refraction {
   border-color: rgb(221 227 255 / 30%);
 }
 
-.organization-logo {
-  align-self: center;
-  width: min(180px, 100%);
-  max-width: 100%;
-  height: 112px;
-  max-height: 112px;
-  margin: 0 auto 22px;
+.organization-logo-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 128px;
+  min-width: 0;
+  overflow: hidden;
+  --logo-scale: 1;
+}
+
+.organization-logo-stage .organization-logo {
+  flex-shrink: 0;
+  width: auto;
+  max-width: none;
+  height: calc(var(--logo-height) * var(--logo-scale));
+  max-height: none;
+  margin: 0;
   object-fit: contain;
   object-position: center;
 }
 
-.organization-logo--wide {
+/* Balance the visible artwork inside the originals' unequal transparent margins. */
+.organization-logo--batstateu {
+  --logo-height: 136px;
+  transform: translateY(3px);
+}
+.organization-logo--cursor {
+  --logo-height: 152px;
+  transform: translateY(-3px);
+}
+.organization-logo--ub {
+  --logo-height: 142px;
+  transform: translateY(4px);
+}
+
+.organization-logo-stage .organization-logo--lpu {
+  width: min(154px, 100%);
+  height: 94px;
   object-fit: cover;
   border-radius: 8px;
 }
 
 .organization-card h3,
-.organization-card .organization-role,
-.organization-card > p,
-.organization-card > span {
+.organization-card > p {
   width: 100%;
+  margin: 0;
   text-align: center;
+  align-self: start;
 }
 
-.organization-card h3 {
-  margin-top: auto;
-}
-
-.organization-role {
-  margin-inline: auto;
+.organization-card .organization-role {
+  min-height: 0;
+  margin: 0;
+  line-height: 18px;
 }
 
 .module-card,
@@ -309,12 +334,8 @@ html.has-glass-refraction {
     --liquid-backdrop: blur(12px) saturate(1.2);
   }
 
-  html.has-glass-refraction {
-    --liquid-backdrop: url('#liquid-refraction') blur(1px) saturate(1.2);
-  }
-
   .organization-card {
-    min-height: 260px;
+    min-height: 0;
     padding-inline: 16px;
   }
 
@@ -334,5 +355,11 @@ html.has-glass-refraction {
   .graphic-flow,
   .graphic-float {
     animation: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .organization-logo-stage {
+    --logo-scale: 0.88;
   }
 }

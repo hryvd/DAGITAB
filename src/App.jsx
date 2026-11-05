@@ -26,6 +26,7 @@ import {
   MousePointer2,
 } from 'lucide-react';
 import LogoParticles from './LogoParticles';
+import GlassRefraction from './GlassRefraction';
 import { GlassBackdrop, ExperienceGraphic } from './GlassGraphics';
 import batstateuLogo from '../2.png';
 import cursorLogo from '../3.png';
@@ -349,25 +350,28 @@ const organizations = [
     name: 'CURSOR',
     role: 'HOST ORGANIZATION',
     logo: cursorLogo,
+    logoClass: 'organization-logo--cursor',
     detail: 'Computer Engineering Students Organization · BatStateU',
   },
   {
     name: 'Batangas State University',
     role: 'HOST UNIVERSITY',
     logo: batstateuLogo,
+    logoClass: 'organization-logo--batstateu',
     detail: 'The National Engineering University',
   },
   {
     name: 'LPU Batangas',
     role: 'STUDENT COMMUNITY',
     logo: lpuLogo,
-    wide: true,
+    logoClass: 'organization-logo--lpu',
     detail: 'Lyceum of the Philippines University–Batangas',
   },
   {
     name: 'University of Batangas',
     role: 'STUDENT COMMUNITY',
     logo: ubLogo,
+    logoClass: 'organization-logo--ub',
     detail: 'Connecting student builders across campuses',
   },
 ];
@@ -395,15 +399,17 @@ function Organizations() {
               key={item.name}
             >
               <p className="organization-role">{item.role}</p>
-              <img
-                className={`organization-logo${item.wide ? ' organization-logo--wide' : ''}`}
-                src={item.logo}
-                alt={`${item.name} logo`}
-                width="2000"
-                height="2500"
-                loading="lazy"
-                decoding="async"
-              />
+              <div className="organization-logo-stage">
+                <img
+                  className={`organization-logo ${item.logoClass}`}
+                  src={item.logo}
+                  alt={`${item.name} logo`}
+                  width="2000"
+                  height="2500"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
               <h3>{item.name}</h3>
               <p>{item.detail}</p>
             </article>
@@ -1053,10 +1059,6 @@ function usePageMotion(paused) {
   }, [paused]);
 
   useEffect(() => {
-    document.documentElement.classList.toggle(
-      'has-glass-refraction',
-      CSS.supports('backdrop-filter', 'url("#liquid-refraction") blur(2px)'),
-    );
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let observer;
     const elements = document.querySelectorAll(
@@ -1114,7 +1116,6 @@ function usePageMotion(paused) {
       cancelAnimationFrame(frame);
       document.body.classList.remove('has-reveal');
       document.documentElement.style.removeProperty('--page-progress');
-      document.documentElement.classList.remove('has-glass-refraction');
     };
   }, []);
 }
@@ -1136,29 +1137,9 @@ export default function App() {
               <feFuncA type="gamma" exponent="4" />
             </feComponentTransfer>
           </filter>
-          <filter id="liquid-refraction" colorInterpolationFilters="sRGB">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.012 0.018"
-              numOctaves="1"
-              seed="7"
-              result="glass-noise"
-            />
-            <feGaussianBlur
-              in="glass-noise"
-              stdDeviation="2"
-              result="smooth-glass"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="smooth-glass"
-              scale="28"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
         </defs>
       </svg>
+      <GlassRefraction />
       <a className="skip-link" href="#main">
         Skip to content
       </a>
