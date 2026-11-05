@@ -35,10 +35,11 @@ See [the deployment guide](docs/DEPLOYMENT.md) for exact settings and verificati
 
 - `src/eventData.js` contains the official Notion registration URL, schools, module descriptions, FAQs, and planned dates. Update it when CURSOR confirms changes.
 - `src/App.jsx` contains the page structure and interactions. Suggested skills on role cards are illustrative; final assignments and prerequisites belong to CURSOR.
-- `src/styles.css` contains the base responsive styles; `src/redesign.css` defines the cinematic brand treatment, animated atmospheric layers, section reveals, and interactive surfaces.
+- `src/styles.css` contains base responsive styles; `src/redesign.css` defines the black/silver brand treatment, reveals, and layout. `src/liquid-glass.css` adds shared glass surfaces and backdrop refraction on supported browsers, with native blur as the fallback. Foreground text and logos remain undistorted.
+- `src/GlassGraphics.jsx` provides original SVG service-city, community, and system illustrations, plus the thin ribbon underlays visible through glass cards. Page backgrounds remain pure black.
 - `src/LogoParticles.jsx` samples the actual DAGITAB logo into a spring-based particle system. Particles assemble into the logo, respond to pointer movement and taps, and reform. Replay and global pause controls are available; offscreen/hidden tabs suspend rendering and reduced-motion preferences show a static logo immediately.
 - `public/brand/dagitab-logo.svg` is the authoritative event logo uploaded by the user. Only its oversized transparent viewport is trimmed for consistent display; the embedded high-resolution silver artwork, colors, and original transforms are preserved. This same SVG appears in the header/footer and supplies the particle formation mask.
-- `public/organizations/` contains the original CURSOR and BatStateU marks extracted from the supplied event document. Their source resolution is small, so they are displayed at modest sizes. The other student communities are identified by name until their original image files are available; no replacement marks are invented.
+- The uploaded organization originals are `2.png` (BatStateU), `3.png` (CURSOR), `4.png` (UB Computer Engineering Students’ Society), and `5.png` (LPU-B Microsoft Student Community). Vite imports these directly; all four marks are centered without recoloring or altering the originals.
 - `public/dagitab-event-brief.pdf` is the user-supplied source document.
 - Fonts are bundled locally through Fontsource. No third-party moodboard images are used.
 

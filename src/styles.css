@@ -1718,7 +1718,7 @@ img {
   background: linear-gradient(90deg, transparent, #e5ddff70, transparent);
   pointer-events: none;
 }
-.module-card:nth-child(3n + 2) {
+.module-card:nth-of-type(3n + 2) {
   background:
     linear-gradient(135deg, #accced13, #a49ced04 55%, #91c8d307), #14191ed9;
 }

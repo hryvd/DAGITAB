@@ -16,7 +16,6 @@ import {
   Radio,
   LayoutDashboard,
   ShieldCheck,
-  Code2,
   GitMerge,
   Users,
   Braces,
@@ -27,6 +26,11 @@ import {
   MousePointer2,
 } from 'lucide-react';
 import LogoParticles from './LogoParticles';
+import { GlassBackdrop, ExperienceGraphic } from './GlassGraphics';
+import batstateuLogo from '../2.png';
+import cursorLogo from '../3.png';
+import ubLogo from '../4.png';
+import lpuLogo from '../5.png';
 import { REGISTRATION_URL, programStages, modules, faqs } from './eventData';
 
 const icons = {
@@ -347,25 +351,26 @@ const organizations = [
   {
     name: 'CURSOR',
     role: 'HOST ORGANIZATION',
-    logo: '/organizations/cursor.png',
+    logo: cursorLogo,
     detail: 'Computer Engineering Students Organization · BatStateU',
   },
   {
     name: 'Batangas State University',
     role: 'HOST UNIVERSITY',
-    logo: '/organizations/batstateu.png',
+    logo: batstateuLogo,
     detail: 'The National Engineering University',
   },
   {
     name: 'LPU Batangas',
     role: 'STUDENT COMMUNITY',
-    wordmark: 'Microsoft Student Community',
+    logo: lpuLogo,
+    wide: true,
     detail: 'Lyceum of the Philippines University–Batangas',
   },
   {
     name: 'University of Batangas',
     role: 'STUDENT COMMUNITY',
-    wordmark: 'Computer Engineering Students’ Society',
+    logo: ubLogo,
     detail: 'Connecting student builders across campuses',
   },
 ];
@@ -386,25 +391,22 @@ function Organizations() {
           </h2>
         </div>
         <div className="organization-grid">
+          <GlassBackdrop />
           {organizations.map((item) => (
             <article
               className={`organization-card ${item.role === 'HOST ORGANIZATION' ? 'host-organization' : ''}`}
               key={item.name}
             >
               <p className="organization-role">{item.role}</p>
-              {item.logo ? (
-                <img
-                  className="organization-logo"
-                  src={item.logo}
-                  alt={`${item.name} logo`}
-                  width="98"
-                  height="92"
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : (
-                <div className="organization-wordmark">{item.wordmark}</div>
-              )}
+              <img
+                className={`organization-logo${item.wide ? ' organization-logo--wide' : ''}`}
+                src={item.logo}
+                alt={`${item.name} logo`}
+                width="2000"
+                height="2500"
+                loading="lazy"
+                decoding="async"
+              />
               <h3>{item.name}</h3>
               <p>{item.detail}</p>
             </article>
@@ -646,6 +648,7 @@ function Modules() {
           </p>
         </div>
         <div className="module-grid">
+          <GlassBackdrop />
           {modules.map((item, index) => {
             const Icon = icons[item.icon];
             return (
@@ -718,13 +721,7 @@ function Experience() {
         <div className="experience-grid">
           <article className="experience-card">
             <div className="experience-art art-purpose" aria-hidden="true">
-              <div className="wire-globe">
-                <i />
-                <i />
-                <i />
-                <i />
-              </div>
-              <span className="art-cross">✦</span>
+              <ExperienceGraphic kind="purpose" />
               <span className="art-code">[ IMPACT ]</span>
             </div>
             <span className="tiny-label">01 / BUILD WITH PURPOSE</span>
@@ -740,10 +737,7 @@ function Experience() {
           </article>
           <article className="experience-card">
             <div className="experience-art art-community" aria-hidden="true">
-              <div className="orb orb-a" />
-              <div className="orb orb-b" />
-              <div className="orb orb-c" />
-              <div className="community-cross">✳</div>
+              <ExperienceGraphic kind="community" />
               <span className="art-code">[ COMMUNITY ]</span>
             </div>
             <span className="tiny-label">02 / CONNECT ACROSS CAMPUSES</span>
@@ -759,10 +753,7 @@ function Experience() {
           </article>
           <article className="experience-card">
             <div className="experience-art art-shipping" aria-hidden="true">
-              <div className="code-orbit orbit-a" />
-              <div className="code-orbit orbit-b" />
-              <div className="code-orbit orbit-c" />
-              <Code2 size={60} strokeWidth={1} />
+              <ExperienceGraphic kind="system" />
               <span className="art-code">[ COLLECTIVE ]</span>
             </div>
             <span className="tiny-label">03 / TURN IDEAS INTO SYSTEMS</span>
@@ -1022,7 +1013,7 @@ function Footer() {
         <div className="organizer-row">
           <div className="organizer-identity">
             <img
-              src="/organizations/cursor.png"
+              src={cursorLogo}
               alt="CURSOR BatStateU TNEU crest"
               width="35"
               height="50"
@@ -1065,6 +1056,10 @@ function usePageMotion(paused) {
   }, [paused]);
 
   useEffect(() => {
+    document.documentElement.classList.toggle(
+      'has-glass-refraction',
+      CSS.supports('backdrop-filter', 'url("#liquid-refraction") blur(2px)'),
+    );
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let observer;
     const elements = document.querySelectorAll(
@@ -1122,6 +1117,7 @@ function usePageMotion(paused) {
       cancelAnimationFrame(frame);
       document.body.classList.remove('has-reveal');
       document.documentElement.style.removeProperty('--page-progress');
+      document.documentElement.classList.remove('has-glass-refraction');
     };
   }, []);
 }
@@ -1142,6 +1138,27 @@ export default function App() {
             <feComponentTransfer>
               <feFuncA type="gamma" exponent="4" />
             </feComponentTransfer>
+          </filter>
+          <filter id="liquid-refraction" colorInterpolationFilters="sRGB">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.012 0.018"
+              numOctaves="1"
+              seed="7"
+              result="glass-noise"
+            />
+            <feGaussianBlur
+              in="glass-noise"
+              stdDeviation="2"
+              result="smooth-glass"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="smooth-glass"
+              scale="28"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
           </filter>
         </defs>
       </svg>

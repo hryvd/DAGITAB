@@ -10,6 +10,7 @@ import '@fontsource/dm-sans/latin-600.css';
 import App from './App.jsx';
 import './styles.css';
 import './redesign.css';
+import './liquid-glass.css';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

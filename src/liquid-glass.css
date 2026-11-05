@@ -1,0 +1,338 @@
+/* Clear surfaces keep the black canvas visible while bending the artwork below. */
+:root {
+  --liquid-backdrop: blur(20px) saturate(1.35);
+  --liquid-fill: rgb(4 5 7 / 54%);
+  --liquid-edge: rgb(255 255 255 / 19%);
+  --liquid-surface:
+    radial-gradient(
+      ellipse at var(--spot-x, 15%) var(--spot-y, 0%),
+      rgb(255 255 255 / 9%),
+      transparent 58%
+    ),
+    linear-gradient(
+      135deg,
+      rgb(255 255 255 / 6%),
+      transparent 35%,
+      transparent 70%,
+      rgb(181 216 245 / 3%)
+    ),
+    var(--liquid-fill);
+  --liquid-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 22%), inset 1px 0 0 rgb(255 255 255 / 5%),
+    inset 0 -1px 0 rgb(255 255 255 / 6%), inset 0 0 24px rgb(255 255 255 / 2%),
+    0 14px 40px rgb(0 0 0 / 24%);
+}
+
+html.has-glass-refraction {
+  --liquid-backdrop: url('#liquid-refraction') blur(2px) saturate(1.35);
+}
+
+.site-header {
+  background: transparent;
+}
+
+:is(
+  .nav-wrap,
+  .mobile-nav,
+  .hero-bottom,
+  .organization-card,
+  .module-card,
+  .system-diagram,
+  .diagram-node,
+  .experience-art,
+  .roadmap-tabs,
+  .roadmap-list,
+  .faq-item.is-open,
+  .join-card,
+  .role-dialog,
+  .dialog-note
+) {
+  border: 1px solid var(--liquid-edge);
+  background: var(--liquid-surface);
+  box-shadow: var(--liquid-shadow);
+  -webkit-backdrop-filter: var(--liquid-backdrop);
+  backdrop-filter: var(--liquid-backdrop);
+  background-clip: padding-box;
+}
+
+/* A rounded, bright rim and a dark center give glass a readable silhouette. */
+.nav-wrap,
+.mobile-nav {
+  --liquid-fill: rgb(8 9 12 / 62%);
+  border-color: rgb(255 255 255 / 22%);
+}
+
+.hero-bottom {
+  --liquid-fill: rgb(5 6 8 / 46%);
+  border-radius: 20px;
+}
+
+.hero.hero-v2 .hero-bottom {
+  background: var(--liquid-surface);
+  -webkit-backdrop-filter: var(--liquid-backdrop);
+  backdrop-filter: var(--liquid-backdrop);
+}
+
+.organization-grid,
+.module-grid {
+  position: relative;
+  isolation: isolate;
+}
+
+.glass-backdrop {
+  position: absolute;
+  inset: -7% -2%;
+  z-index: -1;
+  width: 104%;
+  height: 114%;
+  overflow: visible;
+  opacity: 0.78;
+  pointer-events: none;
+}
+
+.organization-card {
+  position: relative;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 280px;
+  padding: 28px 22px 25px;
+  text-align: center;
+  --liquid-fill: rgb(4 5 7 / 44%);
+  transition:
+    border-color 240ms ease,
+    box-shadow 240ms ease,
+    transform 240ms ease;
+}
+
+.organization-card.host-organization {
+  border-color: rgb(221 227 255 / 30%);
+}
+
+.organization-logo {
+  align-self: center;
+  width: min(180px, 100%);
+  max-width: 100%;
+  height: 112px;
+  max-height: 112px;
+  margin: 0 auto 22px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.organization-logo--wide {
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.organization-card h3,
+.organization-card .organization-role,
+.organization-card > p,
+.organization-card > span {
+  width: 100%;
+  text-align: center;
+}
+
+.organization-card h3 {
+  margin-top: auto;
+}
+
+.organization-role {
+  margin-inline: auto;
+}
+
+.module-card,
+.module-card:first-of-type,
+.module-card:nth-of-type(3n + 2),
+.module-card:hover {
+  --liquid-fill: rgb(4 5 7 / 48%);
+  background: var(--liquid-surface);
+}
+
+.module-card::before {
+  height: 1px;
+  opacity: 0.8;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 70%),
+    rgb(178 220 242 / 35%),
+    transparent
+  );
+}
+
+.module-card:first-of-type::after {
+  border-color: rgb(219 233 255 / 12%);
+  box-shadow:
+    0 0 0 40px rgb(219 233 255 / 3%),
+    0 0 0 80px rgb(219 233 255 / 2%);
+}
+
+.system-diagram {
+  --liquid-fill: rgb(5 7 10 / 48%);
+}
+
+.diagram-node {
+  --liquid-fill: rgb(14 17 22 / 58%);
+  border-radius: 13px;
+}
+
+.experience-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  --liquid-fill: rgb(4 6 9 / 50%);
+}
+
+.experience-art::after {
+  background: linear-gradient(
+    132deg,
+    rgb(255 255 255 / 12%),
+    transparent 30%,
+    transparent 75%,
+    rgb(255 255 255 / 5%)
+  );
+  opacity: 0.55;
+  border-radius: inherit;
+}
+
+.experience-graphic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.roadmap-tabs,
+.roadmap-list,
+.faq-item.is-open,
+.dialog-note {
+  --liquid-fill: rgb(6 7 10 / 56%);
+}
+
+.roadmap-tabs button {
+  min-height: 48px;
+}
+
+.roadmap-tabs button[aria-selected='true'] {
+  background: linear-gradient(135deg, #ffffff1c, #ffffff07);
+  box-shadow:
+    inset 0 1px 0 #ffffff3d,
+    inset 0 0 0 1px #ffffff1a,
+    0 4px 12px #00000026;
+}
+
+.join-card {
+  --liquid-fill: rgb(5 6 8 / 48%);
+  border-color: rgb(255 255 255 / 25%);
+}
+
+.role-dialog {
+  --liquid-fill: rgb(7 9 12 / 65%);
+}
+
+.role-dialog::backdrop {
+  background: rgb(0 0 0 / 65%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.button-outline,
+.icon-button,
+.replay-button,
+.motion-toggle {
+  min-height: 44px;
+}
+
+.button-outline,
+.icon-button {
+  background: linear-gradient(140deg, #ffffff12, #ffffff03);
+  border-color: #ffffff2b;
+  box-shadow: inset 0 1px 0 #ffffff21;
+}
+
+.graphic-pulse {
+  animation: glass-graphic-pulse 4.8s ease-in-out infinite;
+}
+
+.graphic-flow {
+  animation: glass-graphic-flow 7s linear infinite;
+}
+
+.graphic-float {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: glass-graphic-float 7s ease-in-out infinite;
+}
+
+@keyframes glass-graphic-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes glass-graphic-flow {
+  to {
+    stroke-dashoffset: -198;
+  }
+}
+
+@keyframes glass-graphic-float {
+  0%,
+  100% {
+    transform: translateY(3px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (hover: hover) {
+  .organization-card:hover,
+  .module-card:hover {
+    border-color: rgb(255 255 255 / 35%);
+    box-shadow:
+      var(--liquid-shadow),
+      inset 0 0 36px rgb(219 232 255 / 3%);
+  }
+
+  .organization-card:hover {
+    transform: translateY(-3px);
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --liquid-backdrop: blur(12px) saturate(1.2);
+  }
+
+  html.has-glass-refraction {
+    --liquid-backdrop: url('#liquid-refraction') blur(1px) saturate(1.2);
+  }
+
+  .organization-card {
+    min-height: 260px;
+    padding-inline: 16px;
+  }
+
+  .glass-backdrop {
+    inset-inline: 0;
+    width: 100%;
+    opacity: 0.65;
+  }
+}
+
+.motion-paused :is(.graphic-pulse, .graphic-flow, .graphic-float) {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graphic-pulse,
+  .graphic-flow,
+  .graphic-float {
+    animation: none;
+  }
+}

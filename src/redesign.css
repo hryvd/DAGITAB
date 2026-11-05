@@ -779,13 +779,13 @@ h2 {
     border-color 250ms ease,
     box-shadow 250ms ease;
 }
-.module-card:first-child {
+.module-card:first-of-type {
   grid-column: span 2;
   background:
     radial-gradient(ellipse at 96% 0%, #8a7dba0c, transparent 65%),
     linear-gradient(125deg, #ffffff04, transparent 60%), #09090b;
 }
-.module-card:first-child::after {
+.module-card:first-of-type::after {
   content: '';
   position: absolute;
   width: 260px;
@@ -799,7 +799,7 @@ h2 {
     0 0 0 80px #b695dc04;
   pointer-events: none;
 }
-.module-card:nth-child(3n + 2) {
+.module-card:nth-of-type(3n + 2) {
   background:
     radial-gradient(
       circle at var(--spot-x, 50%) var(--spot-y, 0%),
@@ -856,7 +856,7 @@ h2 {
   letter-spacing: -0.6px;
   color: #f5f5f7;
 }
-.module-card:first-child h3 {
+.module-card:first-of-type h3 {
   font-size: 29px;
 }
 .module-description {
@@ -1328,20 +1328,6 @@ h2 {
   object-fit: contain;
   object-position: left center;
 }
-.organization-wordmark,
-.organization-initial {
-  display: flex;
-  align-items: center;
-  min-height: 76px;
-  margin: 0 0 22px;
-  color: #e9e9ef;
-  font-family: var(--display);
-  font-size: clamp(23px, 2vw, 28px);
-  font-weight: 600;
-  line-height: 1.12;
-  letter-spacing: -0.8px;
-  overflow-wrap: anywhere;
-}
 .organization-card h3 {
   margin: auto 0 7px;
   color: #eeeef3;
@@ -1356,7 +1342,7 @@ h2 {
   font-size: 11px;
   line-height: 1.7;
 }
-.organization-card.hostorganization {
+.organization-card.host-organization {
   border-color: #d1c5f02b;
 }
 
@@ -1582,7 +1568,7 @@ body.has-reveal .module-card.reveal.is-visible:hover {
   .module-card h3 {
     font-size: 21px;
   }
-  .module-card:first-child h3 {
+  .module-card:first-of-type h3 {
     font-size: 27px;
   }
   .experience-art {
@@ -1743,10 +1729,10 @@ body.has-reveal .module-card.reveal.is-visible:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
   }
-  .module-card:first-child {
+  .module-card:first-of-type {
     grid-column: auto;
   }
-  .module-card:first-child h3 {
+  .module-card:first-of-type h3 {
     font-size: 22px;
   }
   .module-card {
@@ -1855,12 +1841,6 @@ body.has-reveal .module-card.reveal.is-visible:hover {
   .organization-logo {
     height: 68px;
     max-height: 72px;
-    margin-bottom: 18px;
-  }
-  .organization-wordmark,
-  .organization-initial {
-    min-height: 68px;
-    font-size: 22px;
     margin-bottom: 18px;
   }
   .organization-card h3 {
@@ -2220,7 +2200,7 @@ body.has-reveal .module-card.reveal.is-visible:hover {
     letter-spacing: 1px;
   }
   .module-card h3,
-  .module-card:first-child h3 {
+  .module-card:first-of-type h3 {
     font-size: 24px;
   }
   .module-description {
