@@ -5,24 +5,19 @@ const COLORS = [
   '#fff8e7',
   '#ecf7ff',
   '#cfebff',
-  '#b6eaff',
-  '#cbbaff',
-  '#f6d5a0',
+  '#b7c1ff',
+  '#c5a5ff',
+  '#e2d4ff',
 ];
 
 /** The supplied DAGITAB silhouette is the source of every particle target. */
 export default function LogoParticles({
   src = '/brand/dagitab-logo.svg',
-  paused = false,
-  replayKey = 0,
   onReady,
 }) {
   const stageRef = useRef(null);
   const canvasRef = useRef(null);
-  const pausedRef = useRef(paused);
-  const controlsRef = useRef(null);
   const onReadyRef = useRef(onReady);
-  const lastReplay = useRef(replayKey);
   const [showFallback, setShowFallback] = useState(true);
   onReadyRef.current = onReady;
 
@@ -92,7 +87,7 @@ export default function LogoParticles({
 
     function makeParticles() {
       const random = seededRandom(56419);
-      const count = Math.min(targets.length, width < 600 ? 2200 : 4600);
+      const count = Math.min(targets.length, width < 600 ? 2800 : 5800);
       groups.forEach((group) => {
         group.length = 0;
       });
@@ -122,18 +117,6 @@ export default function LogoParticles({
       const aspect = image.naturalWidth / image.naturalHeight;
       logoWidth = Math.min(width * 0.94, height * 0.82 * aspect);
       logoHeight = logoWidth / aspect;
-    }
-
-    function settleLogo() {
-      elapsed = 2;
-      burstAge = 99;
-      scatterLevel = 0;
-      for (const particle of particles) {
-        particle.x = width * 0.5 + particle.target.x * logoWidth;
-        particle.y = height * 0.5 + particle.target.y * logoHeight;
-        particle.vx = 0;
-        particle.vy = 0;
-      }
     }
 
     function update(delta) {
@@ -246,7 +229,7 @@ export default function LogoParticles({
           logoWidth,
           logoHeight,
         );
-        if (pointer.active && !pausedRef.current) {
+        if (pointer.active) {
           const radius = width < 600 ? 43 : 82;
           const opening = context.createRadialGradient(
             pointer.x,
@@ -271,7 +254,7 @@ export default function LogoParticles({
         }
         const particleVisibility = Math.min(
           1,
-          1 - underlay * 0.94 + scatterLevel + (pointer.active ? 0.2 : 0),
+          1 - underlay * 0.86 + scatterLevel + (pointer.active ? 0.2 : 0),
         );
         for (let color = 0; color < groups.length; color += 1) {
           context.fillStyle = COLORS[color];
@@ -283,34 +266,28 @@ export default function LogoParticles({
             context.fillRect(particle.x, particle.y, size, size);
           }
         }
-        // Sparse comet filaments make the whole composition visibly flow.
-        for (let i = 0; i < 110; i += 1) {
-          const phase = i / 110;
+        // Fine violet and silver motes stay visible around the formed logo.
+        const moteCount = width < 600 ? 120 : 180;
+        for (let i = 0; i < moteCount; i += 1) {
+          const phase = i / moteCount;
           const angle = phase * TAU + elapsed * 0.27;
           const rx = width * (0.45 + Math.sin(i * 8.9) * 0.025);
           const ry = height * (0.42 + Math.cos(i * 7.3) * 0.035);
           const x = width * 0.5 + Math.cos(angle) * rx;
           const y = height * 0.5 + Math.sin(angle) * ry;
-          context.fillStyle = i % 3 ? '#a4beff' : '#ffdba8';
-          context.globalAlpha = 0.12 + (Math.sin(elapsed + i) + 1) * 0.17;
+          context.fillStyle = i % 3 ? '#bca3ff' : '#e4eaff';
+          context.globalAlpha = 0.38 + (Math.sin(elapsed + i) + 1) * 0.15;
           context.fillRect(x, y, i % 9 === 0 ? 2 : 1, 1);
         }
         context.globalCompositeOperation = 'source-over';
         context.globalAlpha = 1;
-        if (pausedRef.current) canvas.dataset.animationState = 'paused';
       }
       frameCount += 1;
       canvas.dataset.frameCount = String(frameCount);
     }
 
     function tick(timestamp) {
-      if (
-        disposed ||
-        pausedRef.current ||
-        motion.matches ||
-        document.hidden ||
-        !visible
-      ) {
+      if (disposed || motion.matches || document.hidden || !visible) {
         frame = 0;
         return;
       }
@@ -331,24 +308,9 @@ export default function LogoParticles({
       lastTimestamp = 0;
       if (!ready || disposed) return;
       paint();
-      if (
-        !pausedRef.current &&
-        !motion.matches &&
-        !document.hidden &&
-        visible
-      ) {
+      if (!motion.matches && !document.hidden && visible) {
         frame = requestAnimationFrame(tick);
       }
-    }
-
-    function replay() {
-      if (!ready || disposed) return;
-      elapsed = 0;
-      burstAge = 99;
-      scatterLevel = 0;
-      makeParticles();
-      if (pausedRef.current) settleLogo();
-      sync();
     }
 
     function resize() {
@@ -366,13 +328,12 @@ export default function LogoParticles({
         fitLogo();
         makeParticles();
         elapsed = 0;
-        if (pausedRef.current) settleLogo();
         sync();
       }
     }
 
     function move(event) {
-      if (motion.matches || pausedRef.current) return;
+      if (motion.matches) return;
       const bounds = stage.getBoundingClientRect();
       pointer.x = event.clientX - bounds.left;
       pointer.y = event.clientY - bounds.top;
@@ -380,7 +341,7 @@ export default function LogoParticles({
     }
 
     function scatter() {
-      if (motion.matches || pausedRef.current || !ready) return;
+      if (motion.matches || !ready) return;
       burstAge = 0;
       pointer.active = false;
       for (const particle of particles) {
@@ -413,7 +374,6 @@ export default function LogoParticles({
       }
     };
 
-    controlsRef.current = { sync, replay };
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(stage);
     const intersectionObserver = new IntersectionObserver(
@@ -441,9 +401,6 @@ export default function LogoParticles({
         fitLogo();
         makeParticles();
         canvas.dataset.ready = 'true';
-        if (pausedRef.current && !motion.matches) {
-          settleLogo();
-        }
         sync();
         setShowFallback(false);
         onReadyRef.current?.();
@@ -472,21 +429,8 @@ export default function LogoParticles({
       stage.removeEventListener('pointercancel', leave);
       image.onload = null;
       image.onerror = null;
-      controlsRef.current = null;
     };
   }, [src]);
-
-  useEffect(() => {
-    pausedRef.current = paused;
-    controlsRef.current?.sync();
-  }, [paused]);
-
-  useEffect(() => {
-    if (lastReplay.current !== replayKey) {
-      lastReplay.current = replayKey;
-      controlsRef.current?.replay();
-    }
-  }, [replayKey]);
 
   return (
     <div

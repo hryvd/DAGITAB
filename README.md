@@ -2,7 +2,7 @@
 
 A responsive event website for **CPET BISEG: DAGITAB — Building Integrated Systems for E-Governance**, a CURSOR-led collaborative initiative at Batangas State University.
 
-The site introduces Digital Bayanihan, invites student developers from BatStateU, LPU Batangas, and the University of Batangas, and explains the shared platform, eight modules, program stages, and participation expectations.
+The site introduces Digital Bayanihan, invites student developers from BatStateU, LPU Batangas, and the University of Batangas, and explains the shared platform, illustrative work areas, program stages, and participation expectations. Final modules and development order follow the highest priorities identified by Batangas City; the examples do not limit the scope.
 
 ## Run locally
 
@@ -34,10 +34,10 @@ See [the deployment guide](docs/DEPLOYMENT.md) for exact settings and verificati
 ## Content and branding
 
 - `src/eventData.js` contains the official Notion registration URL, schools, module descriptions, FAQs, and planned dates. Update it when CURSOR confirms changes.
-- `src/App.jsx` contains the page structure and interactions. Suggested skills on role cards are illustrative; final assignments and prerequisites belong to CURSOR.
+- `src/App.jsx` contains the page structure and interactions. Work areas and suggested skills are illustrative; the city’s priorities determine scope, while CURSOR confirms assignments and prerequisites.
 - `src/styles.css` contains base responsive styles; `src/redesign.css` defines the black/silver brand treatment, reveals, and layout. `src/liquid-glass.css` adds shared glass surfaces. `src/GlassRefraction.jsx` computes rounded-edge lens maps from each panel’s actual size and corner radius; clear centers remain undistorted and unsupported browsers retain native blur. Foreground text and logos remain sharp.
 - `src/GlassGraphics.jsx` provides original SVG service-city, community, and system illustrations, plus the straight-line underlays visible through glass cards. Page backgrounds remain pure black.
-- `src/LogoParticles.jsx` samples the actual DAGITAB logo into a spring-based particle system. Particles assemble into the logo, respond to pointer movement and taps, and reform. Replay and global pause controls are available; offscreen/hidden tabs suspend rendering and reduced-motion preferences show a static logo immediately.
+- `src/LogoParticles.jsx` samples the actual DAGITAB logo into a spring-based particle system. Particles automatically assemble into the logo, respond to pointer movement and taps, and reform. Offscreen/hidden tabs suspend rendering and reduced-motion preferences show a static logo immediately.
 - `public/brand/dagitab-logo.svg` is the authoritative event logo uploaded by the user. Only its oversized transparent viewport is trimmed for consistent display; the embedded high-resolution silver artwork, colors, and original transforms are preserved. This same SVG appears in the header/footer and supplies the particle formation mask.
 - The uploaded organization originals are `2.png` (BatStateU), `3.png` (CURSOR), `4.png` (UB Computer Engineering Students’ Society), and `5.png` (LPU-B Microsoft Student Community). Vite imports these directly; all four marks are centered without recoloring or altering the originals.
 - `public/dagitab-event-brief.pdf` is the user-supplied source document.
@@ -60,7 +60,7 @@ Production compilation and Chromium desktop/mobile checks are used to validate t
 - FAQ expansion and collapse.
 - Mobile menu navigation and Escape dismissal.
 - Official registration links and downloadable PDF.
-- Visible logo formation, pointer/tap scattering, replay, global pause/resume, and reduced-motion rendering.
+- Automatic logo formation, pointer/tap scattering, offscreen suspension, and reduced-motion rendering.
 - Scroll-triggered section reveals, animated system connections, and page progress.
 - Responsive page widths from 320px to 1440px.
 

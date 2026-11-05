@@ -429,19 +429,6 @@ img {
   color: #8d8d99;
   width: 14px;
 }
-.motion-toggle {
-  background: transparent;
-  border: 0;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #85858f;
-  font-size: 10px;
-  padding: 8px;
-}
-.motion-toggle:hover {
-  color: var(--text);
-}
 .orbit-caption {
   display: flex;
   position: absolute;
@@ -1632,9 +1619,6 @@ img {
 .hero-details svg {
   color: #b4acd4;
 }
-.motion-toggle {
-  color: #aaaabd;
-}
 .campuses {
   border-color: #d5d3ff12;
   background: linear-gradient(90deg, #15122080, #0f101680, #11191b55);
@@ -2517,16 +2501,6 @@ img {
     width: 11px;
     height: 11px;
   }
-  .motion-toggle {
-    font-size: 9px;
-    white-space: nowrap;
-    padding: 2px;
-    gap: 5px;
-  }
-  .motion-toggle svg {
-    width: 10px;
-    height: 10px;
-  }
   .orbit-caption {
     top: auto;
     bottom: 180px;
@@ -3171,9 +3145,6 @@ img {
   .hero-details > span {
     font-size: 7px;
     letter-spacing: 0.1px;
-  }
-  .motion-toggle {
-    font-size: 8px;
   }
   .module-grid {
     gap: 10px;

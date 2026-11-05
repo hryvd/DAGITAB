@@ -44,18 +44,18 @@ h2 {
 }
 .button-lime {
   color: #0c0c0e;
-  border-color: #ffffffc9;
-  background: linear-gradient(135deg, #ffffff, #e7e7ed);
+  border-color: #e4d6ffc9;
+  background: linear-gradient(135deg, #ffffff, #ede6ff);
   box-shadow:
     inset 0 1px 0 #ffffff,
-    0 4px 24px #ffffff10;
+    0 4px 24px #a88bff1a;
 }
 .button-lime:hover {
   color: #000000;
-  background: #ffffff;
+  background: #f5efff;
   box-shadow:
     inset 0 1px 0 #ffffff,
-    0 7px 30px #ffffff1a;
+    0 7px 30px #b196ff2e;
 }
 .button-outline {
   border-color: #ffffff2e;
@@ -84,9 +84,9 @@ h2 {
 .section-label > span {
   width: 26px;
   height: 24px;
-  border-color: #a98aea33;
-  background: #a98aea08;
-  color: #b5a4e2;
+  border-color: #ad8fee66;
+  background: #ad8fee14;
+  color: #d2beff;
   font-size: 10px;
 }
 .tiny-label {
@@ -325,6 +325,10 @@ h2 {
 .logo-particle-fallback {
   filter: url('#logo-no-glow');
 }
+.logo-particle-canvas,
+.logo-particle-fallback {
+  filter: url('#logo-no-glow') drop-shadow(0 0 8px #ae8cff24);
+}
 .logo-fallback {
   position: absolute;
   inset: 0;
@@ -391,7 +395,7 @@ h2 {
 .hero-v2 .hero-copy h2 > span {
   margin-left: 0.2em;
   color: #cbb8ef;
-  background: linear-gradient(100deg, #f5f5f7, #c1c1cc 60%, #b9b0cc);
+  background: linear-gradient(100deg, #f5f5f7, #d6caee 60%, #bca3ee);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -443,29 +447,6 @@ h2 {
 }
 .interaction-hint > svg {
   color: #bda5e0;
-}
-.replay-button,
-.hero-v2 .motion-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-family: var(--display);
-  font-size: 11px;
-  letter-spacing: 0.2px;
-  color: #a1a1a6;
-  border: 0;
-  background: none;
-  min-height: 44px;
-  padding: 10px;
-}
-.replay-button:hover,
-.hero-v2 .motion-toggle:hover {
-  color: #e6daff;
-}
-.replay-button > svg,
-.hero-v2 .motion-toggle > svg {
-  width: 13px;
-  height: 13px;
 }
 .hero-v2 .hero-bottom {
   margin: 25px auto 0;
@@ -732,6 +713,11 @@ h2 {
 .impact-strip > div > span {
   color: #a1a1a6;
   font-size: 9px;
+}
+.impact-strip strong > svg {
+  display: block;
+  width: 0.9em;
+  height: 0.9em;
 }
 .impact-strip > p {
   font-size: 17px;
@@ -1057,10 +1043,11 @@ h2 {
   align-self: center;
   flex-shrink: 0;
   margin-top: 0;
-  background: #a887da0d;
-  border: 1px solid #a78bc13d;
+  background: #b29aff14;
+  border: 1px solid #b59aff66;
   border-radius: 50%;
-  color: #c3a8e7;
+  color: #d6c2ff;
+  box-shadow: 0 0 14px #a78bfa12;
   font-size: 10px;
   z-index: 1;
 }
@@ -1363,21 +1350,6 @@ body.has-reveal .reveal:focus-visible {
 }
 body.has-reveal .module-card.reveal.is-visible:hover {
   transform: translateY(-4px);
-}
-.motion-paused *,
-.motion-paused *::before,
-.motion-paused *::after {
-  animation-play-state: paused !important;
-}
-.motion-paused .roadmap-stage {
-  animation: none;
-  opacity: 1;
-  transform: none;
-}
-.motion-paused .reveal {
-  transition: none !important;
-  opacity: 1 !important;
-  transform: none !important;
 }
 
 @keyframes atmosphere-breathe {
@@ -1996,13 +1968,6 @@ body.has-reveal .module-card.reveal.is-visible:hover {
     flex-basis: 100%;
     font-size: 10px;
     margin-bottom: 3px;
-  }
-  .replay-button,
-  .hero-v2 .motion-toggle {
-    min-height: 44px;
-    font-size: 10px;
-    gap: 6px;
-    padding: 7px;
   }
   .hero-v2 .hero-bottom {
     margin-top: 21px;

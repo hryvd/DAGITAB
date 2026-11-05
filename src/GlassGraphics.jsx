@@ -13,8 +13,8 @@ export function GlassBackdrop() {
       <defs>
         <linearGradient id={`${id}-line`} x1="0" y1="1" x2="1" y2="0">
           <stop stopColor="#b8b5d7" stopOpacity="0" />
-          <stop offset=".3" stopColor="#c2dce8" stopOpacity=".25" />
-          <stop offset=".6" stopColor="#eaf5ff" stopOpacity=".55" />
+          <stop offset=".3" stopColor="#cab7f0" stopOpacity=".25" />
+          <stop offset=".6" stopColor="#e5dcff" stopOpacity=".55" />
           <stop offset="1" stopColor="#a6bfd5" stopOpacity="0" />
         </linearGradient>
       </defs>
@@ -30,12 +30,12 @@ export function GlassBackdrop() {
         className="graphic-flow"
         d="M-80 580L1080 40"
         fill="none"
-        stroke="#d3edff"
+        stroke="#cbb6ff"
         strokeWidth="2"
         strokeDasharray="2 196"
         opacity=".45"
       />
-      <g fill="#d5edfb" className="graphic-pulse">
+      <g fill="#d2bdff" className="graphic-pulse">
         <circle cx="180" cy="160" r="1.7" />
         <circle cx="780" cy="430" r="1.7" />
       </g>

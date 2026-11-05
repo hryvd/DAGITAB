@@ -16,7 +16,7 @@ export const programStages = [
     date: '2026-10-30',
     dateLabel: 'Oct 30, 2026 · time TBA',
     description:
-      'Connect local governance needs with the people and organizations helping build the platform.',
+      'Identify the city’s highest priorities with LGU partners and agree which needs the platform should address first.',
   },
   {
     id: 'architecture',
@@ -24,7 +24,7 @@ export const programStages = [
     date: '2026-11-13',
     dateLabel: 'Nov 13, 2026 · time TBA',
     description:
-      'Shape a shared architecture, agree on APIs, and turn one big idea into connected modules.',
+      'Shape a shared architecture and APIs around the city’s agreed priorities and selected services.',
   },
   {
     id: 'team-formation',
@@ -32,7 +32,7 @@ export const programStages = [
     date: '2026-11-13',
     dateLabel: 'Nov 13, 2026 · time TBA',
     description:
-      'Form cross-organization teams around the features and skills the shared system needs.',
+      'Form cross-organization teams around the city’s priority needs and the skills the agreed scope requires.',
   },
   {
     id: 'development-sprint',
@@ -149,7 +149,7 @@ export const faqs = [
   {
     question: 'What are we actually building?',
     answer:
-      'One integrated e-governance system for Batangas City. Module teams work on areas such as citizen digital ID, permits, reports, alerts, tourism information, and an LGU dashboard. The intended outcome is a unified platform tested with an LGU partner and handed over for a pilot rollout.',
+      'One integrated e-governance platform for Batangas City. Final modules and development order will follow the highest priorities identified by the city. The work areas shown are examples, not a fixed list or limit. Teams will agree the scope with the city and CURSOR, then build, test, and integrate the selected services for a pilot rollout.',
   },
   {
     question: 'When and where will it happen?',

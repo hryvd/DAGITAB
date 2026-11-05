@@ -37,7 +37,7 @@ The build output is `dist/`. Preview serves that output on port 4173. The public
 
 ## Verify the deployed website
 
-- Confirm the DAGITAB heading, particle artwork, glass navigation, and all eight role cards render.
+- Confirm the DAGITAB heading, particle artwork, glass navigation, and all example work-area cards render. Scope should clearly follow the city’s highest priorities.
 - Open and close a role dialog; switch roadmap tabs and FAQ answers.
 - Check the mobile menu and layout on a phone-sized screen.
 - Open the event brief PDF and check the registration buttons use the supplied Notion page.

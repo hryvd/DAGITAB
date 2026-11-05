@@ -20,9 +20,6 @@ import {
   Users,
   Braces,
   ExternalLink,
-  Pause,
-  Play,
-  RotateCcw,
   MousePointer2,
 } from 'lucide-react';
 import LogoParticles from './LogoParticles';
@@ -250,8 +247,7 @@ function SignalTicker() {
   );
 }
 
-function Hero({ paused, onToggleMotion }) {
-  const [replayKey, setReplayKey] = useState(0);
+function Hero() {
   return (
     <>
       <section className="hero hero-v2" aria-labelledby="hero-title">
@@ -267,7 +263,7 @@ function Hero({ paused, onToggleMotion }) {
               DAGITAB
             </h1>
             <div className="logo-stage">
-              <LogoParticles paused={paused} replayKey={replayKey} />
+              <LogoParticles />
             </div>
             <p className="hero-logo-caption">
               BUILDING INTEGRATED SYSTEMS FOR E-GOVERNANCE
@@ -296,27 +292,6 @@ function Hero({ paused, onToggleMotion }) {
               <MousePointer2 size={13} />
               Move or tap the logo to explore.
             </span>
-            <button
-              className="replay-button"
-              onClick={() => {
-                if (paused) onToggleMotion();
-                setReplayKey((key) => key + 1);
-              }}
-            >
-              <RotateCcw size={13} />
-              Replay formation
-            </button>
-            <button
-              className="motion-toggle"
-              onClick={onToggleMotion}
-              aria-label={
-                paused ? 'Play particle animation' : 'Pause particle animation'
-              }
-              aria-pressed={paused}
-            >
-              {paused ? <Play size={13} /> : <Pause size={13} />}
-              <span>{paused ? 'Play motion' : 'Pause motion'}</span>
-            </button>
           </div>
           <div className="hero-bottom">
             <div className="hero-details">
@@ -424,7 +399,7 @@ function SystemDiagram() {
   return (
     <div
       className="system-diagram"
-      aria-label="One shared architecture connects citizen services, permits, reports, alerts, and the LGU dashboard"
+      aria-label="City priorities, resident needs, services, LGU input, and team skills shape one shared platform"
     >
       <div className="diagram-top">
         <span className="tiny-label">THE COLLECTIVE BUILD</span>
@@ -456,29 +431,29 @@ function SystemDiagram() {
         </span>
       </div>
       <span className="diagram-node node-id">
-        <Fingerprint size={20} />
-        Digital ID
+        <Users size={20} />
+        Residents
       </span>
       <span className="diagram-node node-permits">
         <FileCheck2 size={20} />
-        Permits
+        Services
       </span>
       <span className="diagram-node node-reports">
         <MessageSquare size={20} />
-        Reports
+        LGU input
       </span>
       <span className="diagram-node node-alerts">
-        <Radio size={20} />
-        Alerts
+        <Network size={20} />
+        Team skills
       </span>
       <span className="diagram-node node-dashboard">
-        <LayoutDashboard size={20} />
-        Dashboard
+        <MapPin size={20} />
+        City priorities
       </span>
       <div className="diagram-foot">
         <Braces size={15} />
-        <span>many minds. one codebase.</span>
-        <span className="diagram-corner">↗</span>
+        <span>city priorities. shared solutions.</span>
+        <ArrowUpRight className="diagram-corner" size={19} />
       </div>
     </div>
   );
@@ -506,8 +481,9 @@ function About() {
               working, integrated e-governance platform for Batangas City.
             </p>
             <p>
-              Work in cross-campus module teams, learn with mentors, and connect
-              your contribution to a system designed for real public service.
+              Work across campuses with mentors to address the city’s
+              highest-priority needs. The modules and teams will take shape with
+              the city as those priorities are confirmed.
             </p>
             <div className="bayanihan-note">
               <Spark />
@@ -529,8 +505,10 @@ function About() {
           </div>
           <span className="strip-plus">+</span>
           <div>
-            <strong>08</strong>
-            <span>MODULES & TEAMS</span>
+            <strong aria-hidden="true">
+              <ArrowUpRight strokeWidth={1.4} />
+            </strong>
+            <span>CITY-LED SCOPE</span>
           </div>
           <span className="strip-plus">+</span>
           <div>
@@ -606,7 +584,7 @@ function RoleDialog({ index, onClose }) {
           <Icon size={28} />
         </span>
         <p className="tiny-label">
-          MODULE {String(index + 1).padStart(2, '0')} / {item.category}
+          EXAMPLE AREA {String(index + 1).padStart(2, '0')} / {item.category}
         </p>
         <h2 id={titleId}>{item.title}</h2>
         <p>{item.description}</p>
@@ -619,8 +597,9 @@ function RoleDialog({ index, onClose }) {
         <div className="dialog-note">
           <Users size={20} />
           <p>
-            You’ll collaborate with other module teams on one platform. Team
-            assignments and prerequisites will be confirmed by CURSOR.
+            This is an example work area. Final modules and development order
+            will follow the city’s highest priorities. CURSOR will confirm team
+            assignments and prerequisites around the agreed scope.
           </p>
         </div>
         <JoinLink>Explore the developer sign-up</JoinLink>
@@ -643,11 +622,9 @@ function Modules() {
             <span className="muted">Many ways to make it happen.</span>
           </h2>
           <p>
-            From the first API to the final user flow.
-            <br />
-            Find the part of the platform
-            <br />
-            you want to help bring to life.
+            Explore examples of where your skills could fit. Final modules and
+            development order will follow Batangas City’s highest-priority
+            needs.
           </p>
         </div>
         <div className="module-grid">
@@ -677,11 +654,11 @@ function Modules() {
                   <Icon size={25} strokeWidth={1.5} />
                   <span>{String(index + 1).padStart(2, '0')}</span>
                 </div>
-                <p className="tiny-label">{item.category}</p>
+                <p className="tiny-label">EXAMPLE · {item.category}</p>
                 <h3>{item.title}</h3>
                 <p className="module-description">{item.description}</p>
                 <div className="module-card-bottom">
-                  <span>Explore the role</span>
+                  <span>Explore this area</span>
                   <ArrowUpRight size={19} />
                 </div>
               </button>
@@ -690,8 +667,8 @@ function Modules() {
         </div>
         <p className="section-footnote">
           <GitMerge size={15} />
-          Every module connects to the same architecture. Every contribution
-          moves us forward.
+          These examples are not a fixed module list. Teams and scope will adapt
+          to the city’s priorities.
         </p>
       </div>
       {activeRole !== null && (
@@ -1052,12 +1029,7 @@ function Footer() {
   );
 }
 
-function usePageMotion(paused) {
-  useEffect(() => {
-    document.body.classList.toggle('motion-paused', paused);
-    return () => document.body.classList.remove('motion-paused');
-  }, [paused]);
-
+function usePageMotion() {
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let observer;
@@ -1121,8 +1093,7 @@ function usePageMotion(paused) {
 }
 
 export default function App() {
-  const [paused, setPaused] = useState(false);
-  usePageMotion(paused);
+  usePageMotion();
   return (
     <>
       <svg
@@ -1134,7 +1105,7 @@ export default function App() {
         <defs>
           <filter id="logo-no-glow" colorInterpolationFilters="sRGB">
             <feComponentTransfer>
-              <feFuncA type="gamma" exponent="4" />
+              <feFuncA type="gamma" exponent="3" />
             </feComponentTransfer>
           </filter>
         </defs>
@@ -1146,10 +1117,7 @@ export default function App() {
       <div id="top" />
       <Header />
       <main id="main">
-        <Hero
-          paused={paused}
-          onToggleMotion={() => setPaused((value) => !value)}
-        />
+        <Hero />
         <Organizations />
         <About />
         <Modules />
