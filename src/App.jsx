@@ -1138,6 +1138,20 @@ export default function App() {
   usePageMotion(paused);
   return (
     <>
+      <svg
+        width="0"
+        height="0"
+        aria-hidden="true"
+        style={{ position: 'absolute' }}
+      >
+        <defs>
+          <filter id="logo-no-glow" colorInterpolationFilters="sRGB">
+            <feComponentTransfer>
+              <feFuncA type="gamma" exponent="4" />
+            </feComponentTransfer>
+          </filter>
+        </defs>
+      </svg>
       <a className="skip-link" href="#main">
         Skip to content
       </a>

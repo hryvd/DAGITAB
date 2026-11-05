@@ -21,16 +21,16 @@ export const programStages = [
   {
     id: 'architecture',
     title: 'System architecture workshop',
-    date: '2026-11-03',
-    dateLabel: 'Nov 3, 2026 · time TBA',
+    date: '2026-11-13',
+    dateLabel: 'Nov 13, 2026 · time TBA',
     description:
       'Shape a shared architecture, agree on APIs, and turn one big idea into connected modules.',
   },
   {
     id: 'team-formation',
     title: 'Module team formation',
-    date: '2026-11-03',
-    dateLabel: 'Nov 3, 2026 · time TBA',
+    date: '2026-11-13',
+    dateLabel: 'Nov 13, 2026 · time TBA',
     description:
       'Form cross-organization teams around the features and skills the shared system needs.',
   },

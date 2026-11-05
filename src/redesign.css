@@ -320,6 +320,11 @@ h2 {
   height: 100%;
   touch-action: pan-y;
 }
+.brand-logo,
+.logo-particle-canvas,
+.logo-particle-fallback {
+  filter: url('#logo-no-glow');
+}
 .logo-fallback {
   position: absolute;
   inset: 0;

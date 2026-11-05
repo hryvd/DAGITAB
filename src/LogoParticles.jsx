@@ -238,7 +238,7 @@ export default function LogoParticles({
         context.globalCompositeOperation = 'lighter';
         // Reveal the supplied silver artwork intact as its particles assemble.
         const underlay = Math.max(0, Math.min(1, (elapsed - 0.65) / 1.4));
-        context.globalAlpha = underlay * (1 - scatterLevel) * 0.96;
+        context.globalAlpha = underlay * (1 - scatterLevel);
         context.drawImage(
           image,
           (width - logoWidth) / 2,
