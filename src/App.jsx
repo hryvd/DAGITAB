@@ -273,9 +273,6 @@ function Hero({ paused, onToggleMotion }) {
             </p>
           </div>
           <div className="hero-copy">
-            <div className="theme-tag">
-              <span />A COLLABORATIVE BUILD. A COLLECTIVE IMPACT.
-            </div>
             <h2>
               One spark.
               <br />
