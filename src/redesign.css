@@ -1054,6 +1054,7 @@ h2 {
   height: 31px;
   display: grid;
   place-items: center;
+  align-self: center;
   flex-shrink: 0;
   margin-top: 0;
   background: #a887da0d;
@@ -2278,7 +2279,8 @@ body.has-reveal .module-card.reveal.is-visible:hover {
     width: 26px;
     height: 26px;
     font-size: 9px;
-    margin-top: 1px;
+    grid-row: span 2;
+    margin-top: 0;
   }
   .stage-main h3 {
     font-size: 19px;
