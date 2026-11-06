@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="220" viewBox="0 0 160 220" role="img" aria-labelledby="map-title map-description">
+  <title id="map-title">Batangas City map outline</title>
+  <desc id="map-description">North-up boundary of Batangas City, including Verde Island. Derived from NAMRIA and PSA boundaries through OCHA COD-AB, via James Faeldon's Philippines JSON Maps, PSGC 3Q 2026.</desc>
+  <metadata><![CDATA[
+Source: https://github.com/faeldon/philippines-json-maps/blob/bf7060598ff5a5d160917f1dcb9622dbaef85ff7/latest/geojson/provdists/medres/municities-provdist-401000000.0.01.json
+Feature: Batangas City; PSGC 0401005000; geo_level City.
+Source release: PSGC 3Q 2026; repository commit bf7060598ff5a5d160917f1dcb9622dbaef85ff7, 2026-10-28.
+Underlying boundary attribution: National Mapping and Resource Information Authority (NAMRIA) and Philippine Statistics Authority (PSA), through OCHA's Philippines COD-AB.
+Boundary license: Creative Commons Attribution 3.0 IGO (CC BY 3.0 IGO), https://creativecommons.org/licenses/by/3.0/igo/
+Boundary dataset: https://data.humdata.org/dataset/cod-ab-phl
+Changes: selected the Batangas City feature from the medium-resolution GeoJSON; retained both mainland and Verde Island; converted longitude/latitude to a local north-up equirectangular SVG using the midpoint-latitude longitude scale; applied visual styling and coordinate rounding. No further boundary simplification.
+MIT License
+Copyright (c) James Faeldon.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  ]]></metadata>
+  <defs>
+    <linearGradient id="map-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#eee5ff" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#b69aff" stop-opacity=".1"/>
+    </linearGradient>
+    <linearGradient id="map-edge" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f5efff"/>
+      <stop offset="1" stop-color="#b59aff"/>
+    </linearGradient>
+  </defs>
+  <path d="M79.60 14.20L75.94 12.00L72.65 12.42L70.87 13.44L70.02 15.13L67.79 15.71L61.52 16.13L56.68 17.63L53.63 19.50L53.84 20.79L52.39 24.13L52.60 25.61L48.45 31.89L46.86 36.91L44.15 39.80L43.58 43.30L41.51 45.20L39.89 45.58L37.14 49.26L34.58 57.47L40.35 61.80L43.04 59.45L44.28 62.20L41.04 64.07L43.24 68.84L45.05 69.41L46.33 73.65L50.75 77.87L52.33 76.57L52.88 78.74L52.21 80.83L53.51 84.52L52.50 86.15L54.27 90.20L53.71 95.85L49.85 99.17L48.36 102.73L47.68 105.55L47.64 109.08L46.91 110.60L49.54 118.86L49.42 121.66L47.08 126.01L46.63 129.02L43.01 133.12L40.84 136.04L38.76 140.36L39.52 141.65L43.25 142.12L45.83 140.21L48.83 140.55L50.51 144.08L52.56 145.47L56.25 143.35L58.79 143.25L60.05 143.85L61.75 146.25L64.04 150.72L66.37 149.38L71.89 147.34L79.34 147.07L80.83 146.59L86.14 143.16L99.14 141.00L101.60 140.99L104.00 140.24L110.01 136.81L115.69 135.40L120.83 135.00L123.00 135.27L121.70 130.83L120.34 129.83L120.15 125.95L117.67 121.39L117.74 119.77L119.10 111.17L123.44 109.98L123.88 109.10L121.16 105.94L124.87 105.58L125.42 104.43L123.88 101.96L124.68 98.42L122.33 97.22L121.42 95.00L121.77 91.89L122.63 90.11L124.55 88.61L123.55 86.73L123.12 84.06L125.12 78.29L124.43 76.12L124.20 71.61L122.42 69.93L121.14 67.30L119.91 67.43L118.87 65.85L117.27 65.39L115.25 61.41L114.95 59.43L113.68 59.21L108.92 55.67L107.48 53.83L105.81 52.93L105.06 50.83L102.44 49.10L100.43 45.06L97.56 43.98L94.83 44.55L93.46 45.46L91.56 44.67L90.08 46.24L88.81 45.62L85.54 45.56L84.68 44.04L80.37 45.27L79.30 46.77L77.45 45.04L75.15 45.40L74.46 43.33L75.92 42.62L75.26 39.44L76.65 37.49L76.59 35.63L77.99 35.45L79.84 33.09L79.07 28.75L77.59 27.62L76.93 25.47L77.24 22.71L78.61 18.36L80.05 16.10ZM61.59 204.72L65.61 208.00L68.05 207.59L71.43 205.84L72.54 205.78L77.03 203.10L75.71 201.42L75.63 199.33L74.55 194.44L74.34 189.75L73.13 184.32L68.60 178.67L65.93 181.23L63.05 181.56L58.25 184.71L55.94 185.39L52.35 185.35L49.90 184.79L46.74 183.41L44.05 179.14L43.04 179.74L43.82 183.39L43.43 185.79L43.81 187.73L49.07 189.73L51.40 193.69L54.41 196.83L57.06 198.69L58.57 201.06L60.73 203.11Z" fill="url(#map-fill)" fill-rule="evenodd" stroke="url(#map-edge)" stroke-width="2.1" stroke-linejoin="round"/>
+</svg>

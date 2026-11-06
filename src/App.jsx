@@ -391,14 +391,14 @@ const organizations = [
     role: 'STUDENT COMMUNITY',
     logo: lpuLogo,
     logoClass: 'organization-logo--lpu',
-    detail: 'Lyceum of the Philippines University–Batangas',
+    detail: 'LPU-B Microsoft Student Community',
   },
   {
     name: 'University of Batangas',
     role: 'STUDENT COMMUNITY',
     logo: ubLogo,
     logoClass: 'organization-logo--ub',
-    detail: 'Connecting student builders across campuses',
+    detail: 'Computer Engineering Students’ Society',
   },
 ];
 
@@ -419,6 +419,46 @@ function Organizations() {
         </div>
         <div className="organization-grid">
           <GlassBackdrop />
+          <article
+            className="organization-card recipient-card"
+            aria-labelledby="recipient-city-title"
+          >
+            <p className="organization-role">MAIN RECIPIENT LGU</p>
+            <div className="organization-logo-stage">
+              <img
+                className="organization-logo organization-logo--city"
+                src="/organizations/batangas-city-map.svg"
+                alt="Map outline of Batangas City, including Verde Island"
+                width="160"
+                height="220"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <h3 id="recipient-city-title">Batangas City</h3>
+            <p className="recipient-description">
+              Primary LGU recipient of the shared e-governance platform. Modules
+              follow the city’s highest-priority needs.
+            </p>
+            <p className="recipient-map-credit">
+              Map outline:{' '}
+              <a
+                href="https://github.com/faeldon/philippines-json-maps/blob/bf7060598ff5a5d160917f1dcb9622dbaef85ff7/latest/geojson/provdists/medres/municities-provdist-401000000.0.01.json"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                NAMRIA / PSA via OCHA · Philippines JSON Maps
+              </a>{' '}
+              ·{' '}
+              <a
+                href="https://creativecommons.org/licenses/by/3.0/igo/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                CC BY 3.0 IGO
+              </a>
+            </p>
+          </article>
           {organizations.map((item) => (
             <article
               className={`organization-card ${item.role === 'HOST ORGANIZATION' ? 'host-organization' : ''}`}

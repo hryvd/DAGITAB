@@ -166,6 +166,74 @@
   line-height: 18px;
 }
 
+.organization-card.recipient-card {
+  grid-column: 1 / -1;
+  grid-template-columns: 144px minmax(0, 1fr);
+  grid-template-rows: 18px auto auto auto;
+  grid-template-areas:
+    'logo role'
+    'logo name'
+    'logo detail'
+    'logo credit';
+  gap: 7px 28px;
+  align-content: center;
+  justify-items: start;
+  min-height: 202px;
+  padding: 28px 32px;
+  border-color: rgb(194 172 255 / 35%);
+}
+
+.recipient-card .organization-logo-stage {
+  grid-area: logo;
+  width: 144px;
+  height: 144px;
+  align-self: center;
+}
+
+.organization-logo--city {
+  --logo-height: 128px;
+}
+
+.recipient-card .organization-role {
+  grid-area: role;
+  color: #cdb8f5;
+}
+
+.organization-card.recipient-card h3 {
+  grid-area: name;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.organization-card.recipient-card > p,
+.organization-card.recipient-card h3 {
+  text-align: left;
+}
+
+.organization-card > p.recipient-description {
+  grid-area: detail;
+  max-width: 760px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.organization-card.recipient-card > p.recipient-map-credit {
+  grid-area: credit;
+  color: #929099;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.recipient-map-credit a {
+  text-decoration: underline;
+  text-decoration-color: #a691ca66;
+  text-underline-offset: 3px;
+}
+
+.recipient-map-credit a:hover {
+  color: #d8c7f5;
+}
+
 .module-card,
 .module-card:first-of-type,
 .module-card:nth-of-type(3n + 2),

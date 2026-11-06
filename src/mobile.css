@@ -54,6 +54,36 @@
     font-size: 9px;
   }
 
+  .organization-card.recipient-card {
+    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-areas:
+      'logo role'
+      'logo name'
+      'logo detail'
+      'credit credit';
+    gap: 7px 14px;
+    padding: 20px 16px;
+  }
+
+  .recipient-card .organization-logo-stage {
+    width: 96px;
+    height: 112px;
+    --logo-scale: 0.82;
+  }
+
+  .organization-card.recipient-card h3 {
+    font-size: 20px;
+  }
+
+  .organization-card > p.recipient-description {
+    font-size: 12px;
+  }
+
+  .organization-card.recipient-card > p.recipient-map-credit {
+    font-size: 10px;
+    padding-top: 5px;
+  }
+
   .module-card {
     min-height: 0;
     padding: 24px 22px;
