@@ -59,8 +59,7 @@
     grid-template-areas:
       'logo role'
       'logo name'
-      'logo detail'
-      'credit credit';
+      'logo detail';
     gap: 7px 14px;
     padding: 20px 16px;
   }
@@ -77,11 +76,6 @@
 
   .organization-card > p.recipient-description {
     font-size: 12px;
-  }
-
-  .organization-card.recipient-card > p.recipient-map-credit {
-    font-size: 10px;
-    padding-top: 5px;
   }
 
   .module-card {

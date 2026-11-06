@@ -440,24 +440,6 @@ function Organizations() {
               Primary LGU recipient of the shared e-governance platform. Modules
               follow the city’s highest-priority needs.
             </p>
-            <p className="recipient-map-credit">
-              Map outline:{' '}
-              <a
-                href="https://github.com/faeldon/philippines-json-maps/blob/bf7060598ff5a5d160917f1dcb9622dbaef85ff7/latest/geojson/provdists/medres/municities-provdist-401000000.0.01.json"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                NAMRIA / PSA via OCHA · Philippines JSON Maps
-              </a>{' '}
-              ·{' '}
-              <a
-                href="https://creativecommons.org/licenses/by/3.0/igo/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                CC BY 3.0 IGO
-              </a>
-            </p>
           </article>
           {organizations.map((item) => (
             <article
