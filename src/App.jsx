@@ -316,9 +316,6 @@ function Hero() {
             <div className="logo-stage">
               <LogoParticles />
             </div>
-            <p className="hero-logo-caption">
-              BUILDING INTEGRATED SYSTEMS FOR E-GOVERNANCE
-            </p>
           </div>
           <div className="hero-copy">
             <h2>

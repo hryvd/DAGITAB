@@ -6,7 +6,7 @@ export const programStages = [
     id: 'developer-hunt',
     title: 'Developer hunt',
     date: '2027-05',
-    dateLabel: 'May 2027',
+    dateLabel: 'Open until May 2027',
     description:
       'Meet the initiative, the community, and the shared mission behind DAGITAB.',
   },

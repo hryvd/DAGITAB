@@ -336,28 +336,6 @@ h2 {
   height: 100%;
   object-fit: contain;
 }
-.hero-v2 .hero-logo-caption {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 11px;
-  font-family: var(--display);
-  font-size: 9px;
-  letter-spacing: 2.2px;
-  line-height: 1.8;
-  color: #b5aec8;
-  margin: -3px auto 0;
-}
-.hero-logo-caption::before,
-.hero-logo-caption::after {
-  content: '';
-  width: 43px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #b8a1e959);
-}
-.hero-logo-caption::after {
-  transform: rotate(180deg);
-}
 .hero-v2 .hero-copy {
   text-align: center;
   max-width: 960px;
@@ -1912,19 +1890,6 @@ body.has-reveal .module-card.reveal.is-visible:hover {
     font-size: 12px;
     opacity: 0.4;
   }
-  .hero-v2 .hero-logo-caption {
-    gap: 8px;
-    max-width: 300px;
-    margin-top: -6px;
-    font-size: 8px;
-    line-height: 1.8;
-    letter-spacing: 0.65px;
-  }
-  .hero-logo-caption::before,
-  .hero-logo-caption::after {
-    width: 15px;
-    flex-shrink: 0;
-  }
   .hero-v2 .hero-copy {
     margin-top: 31px;
     max-width: 100%;
@@ -2425,10 +2390,6 @@ body.has-reveal .module-card.reveal.is-visible:hover {
   }
   .hero-v2 .hero-copy h2 {
     font-size: 30px;
-  }
-  .hero-v2 .hero-logo-caption {
-    font-size: 8px;
-    letter-spacing: 0.4px;
   }
   .hero-v2 .hero-copy > p {
     font-size: 13px;
