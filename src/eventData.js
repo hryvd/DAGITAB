@@ -4,9 +4,9 @@ export const REGISTRATION_URL =
 export const programStages = [
   {
     id: 'developer-hunt',
-    title: 'Developer hunt & orientation',
-    date: '2026-10-26',
-    dateLabel: 'Oct 26, 2026 · 1–5 PM',
+    title: 'Developer hunt',
+    date: '2027-05',
+    dateLabel: 'May 2027',
     description:
       'Meet the initiative, the community, and the shared mission behind DAGITAB.',
   },
