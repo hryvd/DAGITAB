@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, rm, stat, mkdir, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { createApp, hashPassword } from '../server/app.mjs';
 
 test('accounts, CSRF, team permissions, delegation, persistence, and private storage', async () => {
@@ -294,6 +295,130 @@ test('accounts, CSRF, team permissions, delegation, persistence, and private sto
     await secure.close();
   } finally {
     await app.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('explicit local admin demo preserves accounts and is rejected on hosted origins and production', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'dagitab-demo-'));
+  const dbPath = join(directory, 'demo.sqlite');
+  const demoEnvironment = {
+    ...process.env,
+    NODE_ENV: 'development',
+    DAGITAB_DB_PATH: dbPath,
+  };
+  const runDemo = (environment = {}) =>
+    spawnSync(process.execPath, ['server/admin-demo.mjs'], {
+      cwd: new URL('../', import.meta.url),
+      env: { ...demoEnvironment, ...environment },
+      encoding: 'utf8',
+    });
+  let app;
+  try {
+    assert.equal(runDemo().status, 0);
+    app = createApp({ dbPath });
+    const original = app.db
+      .prepare('SELECT * FROM users WHERE username=?')
+      .get('admin');
+    assert.equal(original.localDemo, 1);
+    assert.equal(original.role, 'admin');
+    assert.notEqual(original.password, 'admin');
+    assert.equal(runDemo().status, 1);
+    assert.equal(
+      app.db.prepare('SELECT password FROM users WHERE username=?').get('admin')
+        .password,
+      original.password,
+    );
+    assert.equal(runDemo({ NODE_ENV: 'production' }).status, 1);
+    assert.equal(runDemo({ VERCEL: '1' }).status, 1);
+    await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
+    const base = `http://127.0.0.1:${app.server.address().port}`;
+    let session = await fetch(`${base}/api/session`);
+    let cookie = session.headers.get('set-cookie').split(';')[0];
+    let { csrfToken } = await session.json();
+    const login = async (host, origin) =>
+      fetch(`${base}/api/login`, {
+        method: 'POST',
+        headers: {
+          Cookie: cookie,
+          Origin: origin || base,
+          Host: host || new URL(base).host,
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
+        body: JSON.stringify({ identifier: 'admin', password: 'admin' }),
+      });
+    assert.ok(
+      [401, 403].includes(
+        (await login('events.example.test', 'http://events.example.test'))
+          .status,
+      ),
+    );
+    let response = await login();
+    assert.equal(response.status, 200);
+    cookie = response.headers.get('set-cookie').split(';')[0];
+    csrfToken = (await response.json()).csrfToken;
+    assert.equal(
+      (await fetch(`${base}/api/workspace`, { headers: { Cookie: cookie } }))
+        .status,
+      200,
+    );
+    response = await fetch(`${base}/api/register`, {
+      method: 'POST',
+      headers: {
+        Cookie: cookie,
+        Origin: base,
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      body: JSON.stringify({
+        name: 'Weak account',
+        email: 'weak@example.test',
+        password: 'admin',
+        school: 'Test school',
+        teamId: 'frontend',
+        expertise: ['Data'],
+        localDemo: 1,
+        role: 'admin',
+      }),
+    });
+    assert.equal(response.status, 400);
+    await app.close();
+    app = createApp({
+      dbPath,
+      production: true,
+      origin: 'https://www.dagitab.xyz',
+    });
+    await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
+    const productionBase = `http://127.0.0.1:${app.server.address().port}`;
+    response = await fetch(`${productionBase}/api/workspace`, {
+      headers: { Cookie: cookie },
+    });
+    assert.equal(
+      response.status,
+      401,
+      'Existing demo sessions cannot access production resources.',
+    );
+    session = await fetch(`${productionBase}/api/session`);
+    cookie = session.headers.get('set-cookie').split(';')[0];
+    csrfToken = (await session.json()).csrfToken;
+    response = await fetch(`${productionBase}/api/login`, {
+      method: 'POST',
+      headers: {
+        Cookie: cookie,
+        Origin: 'https://www.dagitab.xyz',
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      body: JSON.stringify({ identifier: 'admin', password: 'admin' }),
+    });
+    assert.equal(
+      response.status,
+      401,
+      'Production rejects demo username and password.',
+    );
+  } finally {
+    if (app) await app.close();
     await rm(directory, { recursive: true, force: true });
   }
 });

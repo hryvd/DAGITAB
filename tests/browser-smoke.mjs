@@ -146,7 +146,9 @@ try {
       .getByText('Account service unavailable', { exact: true })
       .waitFor();
     assert.equal(
-      await publicPage.locator('input[name="email"]').count(),
+      await publicPage
+        .locator('input[name="email"], input[name="identifier"]')
+        .count(),
       1,
       'auth page survives unavailable API',
     );
@@ -178,7 +180,9 @@ try {
     .getByText('Account service unavailable', { exact: true })
     .waitFor();
   assert.equal(
-    await publicPage.locator('input[name="email"]').count(),
+    await publicPage
+      .locator('input[name="email"], input[name="identifier"]')
+      .count(),
     1,
     'HTML fallback does not break registration',
   );
@@ -201,7 +205,7 @@ try {
   );
   const admin = await newPage();
   await admin.goto(`${base}/admin/login`);
-  await admin.getByLabel('Email address').fill('admin@example.test');
+  await admin.getByLabel('Username or email').fill('admin@example.test');
   await admin.locator('input[name="password"]').fill(password);
   await admin.getByRole('button', { name: 'Sign in to workspace' }).click();
   await admin.waitForURL('**/dashboard');

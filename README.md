@@ -42,6 +42,10 @@ unset dagitab_admin_password
 
 Use the same `DAGITAB_DB_PATH` for the CLI and running server. Never put passwords in command arguments, source files, or chat. The CLI creates an administrator; registration always creates a member and cannot promote an account.
 
+For local testing only, run `npm run admin:demo` once, then restart `npm run dev`. The requested demo username is `admin` and password is `admin`; the development server binds to loopback when this account exists. This is an explicit test account, never created during installation/startup. It cannot sign in or use an old session in production or hosted environments. The helper refuses to overwrite existing accounts. Use a separately provisioned strong-password administrator for a live site.
+
+Sign-in accepts an email or provisioned username. Public registration still requires an email and a password of at least 12 characters.
+
 Passwords are salted and hashed with scrypt. Sessions use expiring HttpOnly cookies, CSRF tokens, and same-origin checks; production cookies also require HTTPS. The API checks team membership for task and project access. Team peers receive names and team membership; administrators can see registration email, school, expertise, and contribution details. The current release has no email verification or self-service password recovery.
 
 **SQLite data is not encrypted by the application.** Production needs an encrypted persistent volume, encrypted backups, and restricted host access. See [the deployment guide](docs/DEPLOYMENT.md) for HTTPS, database, and startup requirements. A static-only Vercel deployment cannot run the account or team workspace APIs. The included Vercel API bridge can connect the frontend to a separate persistent backend; configure it using the deployment guide. Local checks do not publish the site or push files to GitHub.

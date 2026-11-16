@@ -6,7 +6,13 @@ const app = createApp({
   dbPath: process.env.DAGITAB_DB_PATH,
   origin: process.env.APP_ORIGIN,
 });
-const vite = await createServer();
+// A weak demo account must never be reachable through a public dev listener.
+const localDemo = Boolean(
+  app.db.prepare('SELECT 1 FROM users WHERE localDemo = 1 LIMIT 1').get(),
+);
+const vite = await createServer(
+  localDemo ? { server: { host: '127.0.0.1' } } : {},
+);
 try {
   await new Promise((resolve, reject) => {
     app.server.once('error', reject);

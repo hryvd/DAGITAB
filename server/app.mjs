@@ -80,15 +80,37 @@ export function validatePassword(value) {
   return value;
 }
 
-export async function hashPassword(password) {
-  const salt = randomBytes(16).toString('hex');
-  const key = await derive(
-    validatePassword(password),
-    salt,
-    64,
-    SCRYPT_OPTIONS,
+export function isHostedEnvironment(environment = process.env) {
+  return (
+    environment.NODE_ENV === 'production' ||
+    [
+      'VERCEL',
+      'RENDER',
+      'FLY_APP_NAME',
+      'RAILWAY_ENVIRONMENT_NAME',
+      'DYNO',
+      'AWS_LAMBDA_FUNCTION_NAME',
+      'K_SERVICE',
+    ].some((name) => Boolean(environment[name]))
   );
+}
+
+async function derivePassword(password) {
+  const salt = randomBytes(16).toString('hex');
+  const key = await derive(password, salt, 64, SCRYPT_OPTIONS);
   return `scrypt:32768:${salt}:${key.toString('hex')}`;
+}
+
+export const hashPassword = (password) =>
+  derivePassword(validatePassword(password));
+
+// Deliberately isolated from regular account validation and disabled on hosts.
+export function hashLocalDemoPassword() {
+  if (isHostedEnvironment())
+    throw new Error(
+      'Local demo accounts are disabled on deployed environments.',
+    );
+  return derivePassword('admin');
 }
 
 async function matchesPassword(password, stored) {
@@ -145,6 +167,21 @@ export function openDatabase(dbPath) {
       createdBy INTEGER NOT NULL REFERENCES users(id)
     );
   `);
+  const columns = new Set(
+    db
+      .prepare('PRAGMA table_info(users)')
+      .all()
+      .map((column) => column.name),
+  );
+  if (!columns.has('username'))
+    db.exec('ALTER TABLE users ADD COLUMN username TEXT');
+  if (!columns.has('localDemo'))
+    db.exec(
+      'ALTER TABLE users ADD COLUMN localDemo INTEGER NOT NULL DEFAULT 0',
+    );
+  db.exec(
+    'CREATE UNIQUE INDEX IF NOT EXISTS users_username_unique ON users(lower(username)) WHERE username IS NOT NULL',
+  );
   const insert = db.prepare('INSERT OR IGNORE INTO teams (id) VALUES (?)');
   for (const team of teams) insert.run(team.id);
   if (dbPath !== ':memory:') {
@@ -223,6 +260,32 @@ export function createApp({
   const limits = new Map();
   const dummyPassword = `scrypt:32768:${'0'.repeat(32)}:${'0'.repeat(128)}`;
 
+  function localDemoAllowed(req) {
+    if (
+      production ||
+      isHostedEnvironment() ||
+      req.headers['x-dagitab-proxy-hop']
+    )
+      return false;
+    if (
+      !['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(
+        req.socket.remoteAddress,
+      )
+    )
+      return false;
+    const localHosts = new Set(['localhost', '127.0.0.1', '[::1]']);
+    try {
+      if (!localHosts.has(new URL(`http://${req.headers.host}`).hostname))
+        return false;
+      return (
+        !req.headers.origin ||
+        localHosts.has(new URL(req.headers.origin).hostname)
+      );
+    } catch {
+      return false;
+    }
+  }
+
   function rateLimit(
     req,
     kind,
@@ -269,6 +332,17 @@ export function createApp({
       db
         .prepare('SELECT * FROM sessions WHERE tokenHash = ? AND expiresAt > ?')
         .get(digest(raw), Date.now());
+    if (current?.userId && !localDemoAllowed(req)) {
+      const account = db
+        .prepare('SELECT localDemo FROM users WHERE id=?')
+        .get(current.userId);
+      if (account?.localDemo) {
+        db.prepare('DELETE FROM sessions WHERE tokenHash=?').run(
+          current.tokenHash,
+        );
+        current = null;
+      }
+    }
     if (!current && create) {
       rateLimit(req, 'session', 200, HOUR);
       current = newSession(res, null);
@@ -302,11 +376,12 @@ export function createApp({
     return value;
   }
 
-  function requireUser(current) {
+  function requireUser(current, req) {
     const user =
       current?.userId &&
       db.prepare('SELECT * FROM users WHERE id = ?').get(current.userId);
-    if (!user) throw new HttpError(401, 'Please sign in to continue.');
+    if (!user || (user.localDemo && !localDemoAllowed(req)))
+      throw new HttpError(401, 'Please sign in to continue.');
     return user;
   }
 
@@ -471,21 +546,31 @@ export function createApp({
         if (req.method === 'POST' && path === '/api/login') {
           rateLimit(req, 'login', 30, 15 * 60_000);
           const body = await readJson(req);
-          const email = text(body.email, 'Email', 3, 254).toLowerCase();
+          const identifier = text(
+            body.identifier ?? body.email,
+            'Email or username',
+            3,
+            254,
+          ).toLowerCase();
           const password =
             typeof body.password === 'string' && body.password.length <= 128
               ? body.password
               : '';
-          rateLimit(req, 'login-account', 10, 15 * 60_000, email);
+          rateLimit(req, 'login-account', 10, 15 * 60_000, identifier);
           const user = db
-            .prepare('SELECT * FROM users WHERE email = ?')
-            .get(email);
+            .prepare(
+              'SELECT * FROM users WHERE email = ? OR lower(username) = ?',
+            )
+            .get(identifier, identifier);
           const valid = await matchesPassword(
             password,
             user?.password || dummyPassword,
           );
-          if (!user || !valid)
-            throw new HttpError(401, 'Email or password is incorrect.');
+          if (!user || !valid || (user.localDemo && !localDemoAllowed(req)))
+            throw new HttpError(
+              401,
+              'Email, username, or password is incorrect.',
+            );
           db.prepare('DELETE FROM sessions WHERE tokenHash = ?').run(
             current.tokenHash,
           );
@@ -502,7 +587,7 @@ export function createApp({
           setCookie(res, '', 0);
           return send(res, 200, { user: null });
         }
-        const user = requireUser(current);
+        const user = requireUser(current, req);
         if (req.method === 'GET' && path === '/api/workspace') {
           const params = user.role === 'admin' ? [] : [user.teamId];
           const where = user.role === 'admin' ? '' : ' WHERE teamId = ?';

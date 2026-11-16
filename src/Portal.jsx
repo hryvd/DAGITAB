@@ -452,7 +452,7 @@ function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
         <p className="form-help">
           {registering
             ? 'Choose your team. Tell us what you bring.'
-            : 'Use your account email and password to continue.'}
+            : 'Use your email or username and password to continue.'}
         </p>
         {serviceError && (
           <div className="form-message error" role="alert">
@@ -499,14 +499,16 @@ function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
               </div>
             )}
             <label className="p-field">
-              Email address
+              {registering ? 'Email address' : 'Username or email'}
               <input
-                type="email"
-                name="email"
-                autoComplete="email"
+                type={registering ? 'email' : 'text'}
+                name={registering ? 'email' : 'identifier'}
+                autoComplete={registering ? 'email' : 'username'}
                 required
                 maxLength={254}
-                placeholder="you@example.com"
+                placeholder={
+                  registering ? 'you@example.com' : 'Your username or email'
+                }
               />
             </label>
             <label className="p-field">
