@@ -19,7 +19,6 @@ import {
   GitMerge,
   Users,
   Braces,
-  ExternalLink,
   MousePointer2,
 } from 'lucide-react';
 import LogoParticles from './LogoParticles';
@@ -46,7 +45,7 @@ const navigation = [
   ['The initiative', '#about'],
   ['Your impact', '#modules'],
   ['The roadmap', '#roadmap'],
-  ['FAQs', '#faqs'],
+  ['Teams', '/teams'],
 ];
 const roleSkills = [
   ['System design', 'API design', 'Version control'],
@@ -82,16 +81,9 @@ function JoinLink({
   ...props
 }) {
   return (
-    <a
-      href={REGISTRATION_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={className}
-      {...props}
-    >
+    <a href={REGISTRATION_URL} className={className} {...props}>
       {children}
       <ArrowUpRight size={19} aria-hidden="true" />
-      <span className="sr-only"> (opens Notion in a new tab)</span>
     </a>
   );
 }
@@ -142,6 +134,7 @@ function Header() {
     const hero = document.querySelector('.hero');
     if (hero) observer.observe(hero);
     navigation.forEach(([, href]) => {
+      if (!href.startsWith('#')) return;
       const section = document.querySelector(href);
       if (section) observer.observe(section);
     });
@@ -171,6 +164,10 @@ function Header() {
   }, [menuOpen]);
 
   function navigateToSection(event, href) {
+    if (!href.startsWith('#')) {
+      setMenuOpen(false);
+      return;
+    }
     if (
       event.button ||
       event.metaKey ||
@@ -228,8 +225,11 @@ function Header() {
           ))}
         </nav>
         <div className="nav-actions">
+          <a className="nav-login" href="/login">
+            Sign in
+          </a>
           <JoinLink className="button button-small button-outline">
-            Let’s build
+            Register
           </JoinLink>
           <button
             type="button"
@@ -263,6 +263,10 @@ function Header() {
               <ArrowUpRight size={18} />
             </a>
           ))}
+          <a href="/login" onClick={() => setMenuOpen(false)}>
+            Sign in
+            <ArrowUpRight size={18} />
+          </a>
           <JoinLink
             className="button button-lime"
             onClick={() => setMenuOpen(false)}
@@ -307,6 +311,46 @@ function Hero() {
           <i />
           <i />
           <div className="horizon-grid" />
+          <svg
+            className="hero-constellation"
+            viewBox="0 0 1200 760"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            <defs>
+              <linearGradient id="orbit-spectrum">
+                <stop stopColor="#ffb24a" />
+                <stop offset=".52" stopColor="#ffb24a" stopOpacity=".12" />
+                <stop offset="1" stopColor="#b49aff" />
+              </linearGradient>
+            </defs>
+            <ellipse
+              cx="610"
+              cy="290"
+              rx="530"
+              ry="175"
+              transform="rotate(-20 610 290)"
+            />
+            <ellipse
+              cx="610"
+              cy="290"
+              rx="575"
+              ry="205"
+              transform="rotate(-20 610 290)"
+            />
+            <path d="M96 347 228 195 375 224M830 144 999 232 1081 413" />
+            <g className="constellation-nodes">
+              <circle cx="96" cy="347" r="3" />
+              <circle cx="228" cy="195" r="4" />
+              <circle cx="375" cy="224" r="2" />
+              <circle cx="830" cy="144" r="3" />
+              <circle cx="999" cy="232" r="4" />
+              <circle cx="1081" cy="413" r="2" />
+            </g>
+            <path
+              className="constellation-spark"
+              d="M228 180v30m-15-15h30M999 217v30m-15-15h30"
+            />
+          </svg>
         </div>
         <div className="container hero-content">
           <div className="hero-title-wrap">
@@ -329,9 +373,9 @@ function Hero() {
             </p>
             <div className="hero-buttons">
               <JoinLink />
-              <a className="text-link" href="#about">
-                Discover the initiative
-                <ArrowDown size={17} />
+              <a className="text-link" href="/teams">
+                Find your team
+                <ArrowUpRight size={17} />
               </a>
             </div>
           </div>
@@ -673,7 +717,10 @@ function RoleDialog({ index, onClose }) {
           </p>
         </div>
         <JoinLink>Explore the developer sign-up</JoinLink>
-        <small>You’ll continue to the official Notion registration page.</small>
+        <small>
+          Create your account here and choose the team where you’d like to
+          contribute.
+        </small>
       </div>
     </dialog>
   );
@@ -1088,10 +1135,9 @@ function Footer() {
         <div className="footer-bottom">
           <span>© 2026 CURSOR. CPET BISEG: DAGITAB.</span>
           <span>Building Integrated Systems for E-Governance</span>
-          <a href={REGISTRATION_URL} target="_blank" rel="noopener noreferrer">
+          <a href={REGISTRATION_URL}>
             Developer sign-up
-            <ExternalLink size={12} />
-            <span className="sr-only"> (opens in a new tab)</span>
+            <ArrowUpRight size={12} />
           </a>
         </div>
       </div>
@@ -1180,7 +1226,7 @@ function usePageMotion() {
 export default function App() {
   usePageMotion();
   return (
-    <>
+    <div className="public-site">
       <Starfield />
       <svg
         width="0"
@@ -1213,6 +1259,6 @@ export default function App() {
         <Join />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

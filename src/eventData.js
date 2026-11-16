@@ -1,5 +1,4 @@
-export const REGISTRATION_URL =
-  'https://reminiscent-ironclad-759.notion.site/5a804e699d9c46d1a0bcecaceeae6894?pvs=105';
+export const REGISTRATION_URL = '/register';
 
 export const programStages = [
   {
@@ -169,7 +168,7 @@ export const faqs = [
   {
     question: 'How do I join?',
     answer:
-      'Use the developer sign-up link to open CURSOR’s registration page on Notion and complete the form there. Check the form and CURSOR’s official announcements for current joining requirements and any application deadline.',
+      'Create a DAGITAB account, choose your preferred team, and tell us about your skills and the role you would like to play. After registration, your team workspace shows the projects and tasks assigned to your team. Check CURSOR’s official announcements for current joining requirements and any application deadline.',
   },
 ];
 
