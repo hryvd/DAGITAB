@@ -24,6 +24,7 @@ import {
   BrainCircuit,
 } from 'lucide-react';
 import Starfield from './Starfield';
+import { teams as teamCatalog } from './teamCatalog';
 
 const teamIcons = {
   frontend: Code2,
@@ -67,11 +68,18 @@ async function api(path, options = {}) {
       'X-CSRF-Token': csrfToken,
       ...options.headers,
     },
+    signal: AbortSignal.timeout(12000),
     ...(options.body ? { body: JSON.stringify(options.body) } : {}),
   });
-  const data = await response
-    .json()
-    .catch(() => ({ error: 'The server returned an unexpected response.' }));
+  if (!response.headers.get('content-type')?.includes('application/json')) {
+    throw new Error(
+      'The account service is unavailable. Please try again later.',
+    );
+  }
+  const data = await response.json().catch(() => null);
+  if (!data || typeof data !== 'object') {
+    throw new Error('The account service returned an unexpected response.');
+  }
   if (!response.ok)
     throw new Error(data.error || 'Something went wrong. Please try again.');
   if (data.csrfToken) csrfToken = data.csrfToken;
@@ -81,6 +89,8 @@ const send = (path, body, method = 'POST') => api(path, { method, body });
 const teamName = (teams, id) =>
   teams.find((team) => team.id === id)?.name || 'Team';
 function Availability({ team }) {
+  if (team.availabilityKnown === false)
+    return <span className="p-badge muted">Availability unavailable</span>;
   const full = team.capacity !== null && team.memberCount >= team.capacity;
   return (
     <span className={`p-badge ${team.open && !full ? 'gold' : 'muted'}`}>
@@ -300,8 +310,9 @@ function Teams({ teams, selectedId, user }) {
               <Availability team={team} />
               <div className="team-card-footer">
                 <span>
-                  {team.memberCount}{' '}
-                  {team.memberCount === 1 ? 'builder' : 'builders'} joined
+                  {team.availabilityKnown === false
+                    ? 'Membership unavailable'
+                    : `${team.memberCount} ${team.memberCount === 1 ? 'builder' : 'builders'} joined`}
                 </span>
                 <a
                   href={`/teams/${team.id}`}
@@ -324,7 +335,7 @@ function Teams({ teams, selectedId, user }) {
     </main>
   );
 }
-function Auth({ mode, teams, setSession, user }) {
+function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
   const registering = mode === 'register',
     admin = mode === 'admin';
   const [teamId, setTeamId] = useState(
@@ -344,6 +355,7 @@ function Auth({ mode, teams, setSession, user }) {
   async function submit(event) {
     event.preventDefault();
     setError('');
+    if (serviceError) return;
     if (registering && !expertise.length) {
       setError('Select at least one area of expertise.');
       return;
@@ -442,6 +454,22 @@ function Auth({ mode, teams, setSession, user }) {
             ? 'Choose your team. Tell us what you bring.'
             : 'Use your account email and password to continue.'}
         </p>
+        {serviceError && (
+          <div className="form-message error" role="alert">
+            <strong>Account service unavailable</strong>
+            <p>
+              You can view the form, but sign-in and registration are
+              temporarily unavailable. No information has been submitted.
+            </p>
+            <button
+              className="p-button secondary small"
+              type="button"
+              onClick={onRetry}
+            >
+              Retry connection <RefreshCw size={14} />
+            </button>
+          </div>
+        )}
         <form onSubmit={submit}>
           <fieldset disabled={busy}>
             {registering && (
@@ -591,7 +619,9 @@ function Auth({ mode, teams, setSession, user }) {
             <button
               className="p-button primary"
               type="submit"
-              disabled={busy || (registering && unavailable)}
+              disabled={
+                busy || Boolean(serviceError) || (registering && unavailable)
+              }
             >
               {busy ? (
                 <>
@@ -1362,17 +1392,33 @@ function ErrorState({ error, retry }) {
 }
 export default function Portal() {
   const [session, setSession] = useState(null),
-    [teams, setTeams] = useState([]),
-    [error, setError] = useState('');
-  const path = location.pathname.replace(/\/$/, '') || '/';
+    [teams, setTeams] = useState(
+      teamCatalog.map((team) => ({
+        ...team,
+        open: true,
+        capacity: null,
+        memberCount: null,
+        availabilityKnown: false,
+      })),
+    ),
+    [error, setError] = useState(''),
+    [loading, setLoading] = useState(true);
+  const rawPath = location.pathname.replace(/\/$/, '') || '/';
+  const path = rawPath === '/signup' ? '/register' : rawPath;
   async function load() {
-    setError('');
     try {
       const [sessionData, teamData] = await bootstrap();
+      if (!('user' in sessionData) || !Array.isArray(teamData.teams)) {
+        throw new Error('The account service returned an unexpected response.');
+      }
       setSession(sessionData);
       setTeams(teamData.teams);
+      setError('');
     } catch (err) {
       setError(err.message);
+      setSession((current) => current || { user: null });
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -1398,11 +1444,11 @@ export default function Portal() {
         Skip to content
       </a>
       <PortalHeader user={session?.user} path={path} onLogout={logout} />
-      {error ? (
+      {error && path === '/dashboard' ? (
         <main className="portal-main">
           <ErrorState error={error} retry={load} />
         </main>
-      ) : !session ? (
+      ) : loading ? (
         <Loading />
       ) : path.startsWith('/teams') ? (
         <Teams
@@ -1424,6 +1470,8 @@ export default function Portal() {
           teams={teams}
           user={session.user}
           setSession={setSession}
+          serviceError={error}
+          onRetry={load}
         />
       ) : (
         <main className="portal-main">

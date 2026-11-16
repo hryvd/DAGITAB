@@ -1786,11 +1786,10 @@ img {
   color: #a4a0b5;
 }
 .faq-item {
-  border-color: #d9d0ff1a;
+  padding-inline: 18px;
+  border: 1px solid #d9d0ff1a;
 }
 .faq-item.is-open {
-  padding-inline: 18px;
-  margin-inline: -18px;
   border: 1px solid #d4c4ff28;
   border-radius: 12px;
   background: linear-gradient(135deg, #ae8fe712, #ffffff02);
@@ -3171,9 +3170,8 @@ img {
   .roadmap-list {
     padding-inline: 13px;
   }
-  .faq-item.is-open {
+  .faq-item {
     padding-inline: 12px;
-    margin-inline: -12px;
   }
   .role-dialog {
     -webkit-backdrop-filter: blur(14px);

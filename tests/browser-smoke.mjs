@@ -59,6 +59,56 @@ async function register(page, name, email, teamId) {
 try {
   const publicPage = await newPage();
   await publicPage.goto(base);
+  const header = await publicPage.locator('.site-header').boundingBox();
+  const hero = await publicPage.locator('.hero').boundingBox();
+  assert.equal(header.y, 0);
+  assert.equal(hero.y, 0, 'hero backdrop extends behind floating header');
+  const rows = await publicPage
+    .locator('.roadmap-stage')
+    .evaluateAll((elements) =>
+      elements.map((element) => {
+        const style = getComputedStyle(element);
+        return {
+          fill: style.backgroundColor,
+          image: style.backgroundImage,
+          shadow: style.boxShadow,
+          blur: style.backdropFilter,
+        };
+      }),
+    );
+  for (const row of rows)
+    assert.deepEqual(row, {
+      fill: 'rgba(0, 0, 0, 0)',
+      image: 'none',
+      shadow: 'none',
+      blur: 'none',
+    });
+  for (const width of [1440, 375]) {
+    await publicPage.setViewportSize({ width, height: 1000 });
+    const faqCards = publicPage.locator('.faq-item');
+    const bounds = await faqCards.evaluateAll((elements) =>
+      elements.map((element) => ({
+        x: element.getBoundingClientRect().x,
+        width: element.getBoundingClientRect().width,
+      })),
+    );
+    for (let i = 0; i < (await faqCards.count()); i++) {
+      await faqCards.nth(i).getByRole('button').click();
+      assert.deepEqual(
+        await faqCards.evaluateAll((elements) =>
+          elements.map((element) => ({
+            x: element.getBoundingClientRect().x,
+            width: element.getBoundingClientRect().width,
+          })),
+        ),
+        bounds,
+        'FAQ expansion keeps horizontal alignment',
+      );
+    }
+  }
+  await publicPage.setViewportSize({ width: 1440, height: 1000 });
+  await publicPage.goto(base);
+
   assert.equal(await publicPage.locator('a[href*="notion"]').count(), 0);
   await publicPage.getByRole('link', { name: 'Teams', exact: true }).click();
   await publicPage
@@ -82,6 +132,58 @@ try {
     ),
     'registration fits mobile',
   );
+
+  await publicPage.route('**/api/**', (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: 'application/json',
+      body: JSON.stringify({ error: 'Account service is unavailable.' }),
+    }),
+  );
+  for (const path of ['/login', '/register', '/signup', '/admin/login']) {
+    await publicPage.goto(`${base}${path}`);
+    await publicPage
+      .getByText('Account service unavailable', { exact: true })
+      .waitFor();
+    assert.equal(
+      await publicPage.locator('input[name="email"]').count(),
+      1,
+      'auth page survives unavailable API',
+    );
+    const submit = publicPage.locator('button[type="submit"]');
+    assert.equal(
+      await submit.isDisabled(),
+      true,
+      'never simulate offline account submission',
+    );
+  }
+  await publicPage.goto(`${base}/teams`);
+  assert.equal(await publicPage.locator('.team-card').count(), 6);
+  assert.equal(
+    await publicPage
+      .getByText('Availability unavailable', { exact: true })
+      .count(),
+    6,
+  );
+  await publicPage.unroute('**/api/**');
+  await publicPage.route('**/api/**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      body: '<!doctype html><title>Static fallback</title>',
+    }),
+  );
+  await publicPage.goto(`${base}/register`);
+  await publicPage
+    .getByText('Account service unavailable', { exact: true })
+    .waitFor();
+  assert.equal(
+    await publicPage.locator('input[name="email"]').count(),
+    1,
+    'HTML fallback does not break registration',
+  );
+  await publicPage.unroute('**/api/**');
+
   const member = await newPage();
   const colleague = await newPage();
   const outsider = await newPage();

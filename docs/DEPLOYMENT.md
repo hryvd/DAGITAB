@@ -1,8 +1,20 @@
 # Deploy DAGITAB
 
-DAGITAB now needs a **Node.js 24 server and persistent SQLite storage** for accounts, team availability, projects, and tasks. Deploy the frontend and `/api` on the same HTTPS origin. The server serves the built `dist/` assets and handles direct navigation to `/register`, `/teams`, `/login`, `/admin/login`, and `/dashboard`.
+DAGITAB needs a **Node.js 24 server and persistent SQLite storage** for accounts, team availability, projects, and tasks. You can host the whole app on that server, or keep the frontend on Vercel and connect its `/api` function to the persistent backend. Browser requests always use the frontend's HTTPS origin. Both arrangements support direct navigation to `/register`, `/teams`, `/login`, `/admin/login`, and `/dashboard`.
 
-The previous static Vite/Vercel deployment workflow serves only the frontend. A static import of `dist/`, or the legacy `vercel.json` static configuration, cannot provide working accounts or persistent team workspaces. Use a Node host with persistent storage for this implementation; do not expose registration on a static-only deployment.
+Serving only `dist/` cannot provide accounts or persistent team workspaces. Do not create a SQLite database in a Vercel function: its filesystem is ephemeral and cannot retain registrations safely.
+
+## Vercel frontend with a persistent backend
+
+1. Deploy the Node application on a host with the persistent, encrypted storage and HTTPS configuration described below. Provision the administrator on that host using its persistent database.
+2. On the backend, set `NODE_ENV=production` and `APP_ORIGIN=https://www.dagitab.xyz` (or the exact public frontend origin). The proxy preserves this browser Origin for CSRF validation. Keep one canonical frontend origin; redirect alternate domains to it.
+3. In Vercel project environment settings, set `DAGITAB_API_ORIGIN` to the backend's **exact HTTPS origin**, for example `https://accounts.example.org`. Do not include a path, trailing slash, credentials, or the frontend's own hostname. This is a service address, not a secret or browser `VITE_` variable.
+4. Deploy this repository with the Vite preset, Node.js 24, build command `npm run build`, and output directory `dist`. The `api/[...path].mjs` function forwards only the app's allowed API routes to the configured backend; `vercel.json` supplies the frontend page rewrites.
+5. Redeploy after setting the Vercel variable. Check `/api/session`, then register and sign in through the public website. Confirm member/team isolation and that registrations survive a backend restart. A successful frontend build alone does not verify the backend connection.
+
+The function forwards cookies and CSRF headers without exposing the backend address to browser code. Session cookies are host-only, `Secure`, `HttpOnly`, and `SameSite=Strict` on the frontend. Requests are limited to 16 KiB and upstream calls time out after 10 seconds; redirects are rejected. Missing configuration returns a safe JSON 503 and an unavailable backend returns 502. No successful registration is simulated.
+
+The backend hostname must resolve to the separate persistent Node host, not another alias of the Vercel frontend. Protect the backend with TLS and host-level request limits. The browser's frontend Origin must match `APP_ORIGIN`; configuring the backend's own hostname there would reject form submissions.
 
 ## Install and validate
 

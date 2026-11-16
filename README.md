@@ -44,7 +44,7 @@ Use the same `DAGITAB_DB_PATH` for the CLI and running server. Never put passwor
 
 Passwords are salted and hashed with scrypt. Sessions use expiring HttpOnly cookies, CSRF tokens, and same-origin checks; production cookies also require HTTPS. The API checks team membership for task and project access. Team peers receive names and team membership; administrators can see registration email, school, expertise, and contribution details. The current release has no email verification or self-service password recovery.
 
-**SQLite data is not encrypted by the application.** Production needs an encrypted persistent volume, encrypted backups, and restricted host access. See [the deployment guide](docs/DEPLOYMENT.md) for HTTPS, database, and startup requirements. A static-only Vercel deployment cannot run the account or team workspace APIs. Local checks do not publish the site or push files to GitHub.
+**SQLite data is not encrypted by the application.** Production needs an encrypted persistent volume, encrypted backups, and restricted host access. See [the deployment guide](docs/DEPLOYMENT.md) for HTTPS, database, and startup requirements. A static-only Vercel deployment cannot run the account or team workspace APIs. The included Vercel API bridge can connect the frontend to a separate persistent backend; configure it using the deployment guide. Local checks do not publish the site or push files to GitHub.
 
 ## Content and branding
 

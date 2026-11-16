@@ -277,7 +277,7 @@
   border: 1px solid #ffffff19;
   border-radius: 16px;
   padding: 28px;
-  background: linear-gradient(145deg, #151218cc, #08080be8 70%);
+  background: linear-gradient(145deg, #151218eb, #08080bef 70%);
   transition:
     border-color 200ms,
     transform 200ms;
@@ -382,7 +382,7 @@
   gap: 36px;
   border: 1px solid #ba9dff2b;
   border-radius: 16px;
-  background: linear-gradient(100deg, #ba9dff0b, #ffb45206);
+  background: linear-gradient(100deg, #ba9dff0b, #ffb45206), #0b090ee6;
   padding: 30px 34px;
   margin-top: 32px;
 }
@@ -438,7 +438,7 @@
   line-height: 1.8;
 }
 #root .portal .auth-card {
-  background: linear-gradient(145deg, #19131ee8, #0d0b10de 75%);
+  background: linear-gradient(145deg, #19131ee8, #0d0b10e8 75%);
   border: 1px solid #a487b045;
   border-radius: 18px;
   padding: 34px;
@@ -759,7 +759,7 @@
   border: 1px solid var(--p-line);
   border-radius: 12px;
   padding: 20px 22px;
-  background: #0f0c13c9;
+  background: #0f0c13eb;
   position: relative;
   overflow: hidden;
 }
@@ -821,7 +821,7 @@
   padding: 24px;
   border: 1px solid var(--p-line);
   border-radius: 12px;
-  background: linear-gradient(135deg, #18121fbd, #0b090de0);
+  background: linear-gradient(135deg, #18121feb, #0b090def);
 }
 .portal .project-card h3 {
   font-size: 20px;
@@ -885,7 +885,7 @@
 }
 .task-card {
   border: 1px solid #ffffff20;
-  background: #151019da;
+  background: #151019eb;
   border-radius: 9px;
   padding: 16px;
   margin-bottom: 12px;
@@ -950,7 +950,7 @@
   display: grid;
   border: 1px solid var(--p-line);
   border-radius: 12px;
-  background: #0e0b12ba;
+  background: #0e0b12eb;
   overflow: hidden;
 }
 .member-row {
@@ -998,7 +998,7 @@
 .team-setting {
   border: 1px solid var(--p-line);
   border-radius: 12px;
-  background: #110d16ca;
+  background: #110d16eb;
   padding: 24px;
   display: flex;
   flex-wrap: wrap;
@@ -1124,8 +1124,8 @@
     .team-setting,
     .p-dialog
   ) {
-  -webkit-backdrop-filter: blur(18px) saturate(1.15);
-  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(6px) saturate(1.1);
+  backdrop-filter: blur(6px) saturate(1.1);
 }
 @media (prefers-reduced-transparency: reduce) {
   #root
@@ -1300,7 +1300,7 @@
   margin: 30px 0;
   border: 1px solid #ffb45240;
   border-radius: 16px;
-  background: linear-gradient(130deg, #ffb45209, #ba9dff08);
+  background: linear-gradient(130deg, #ffb45209, #ba9dff08), #0b090ee6;
 }
 .team-detail > .p-button:first-child {
   margin-bottom: 32px;

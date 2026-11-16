@@ -10,3 +10,9 @@ playwright-report
 test-results
 docs
 README.md
+
+# Never upload personal data or SQLite journals
+.data
+**/.data/**
+*.sqlite*
+**/*.sqlite*

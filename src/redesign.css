@@ -2259,8 +2259,6 @@ body.has-reveal .module-card.reveal.is-visible:hover {
     padding-block: 22px;
   }
   .faq-item.is-open {
-    margin-inline: -12px;
-    padding-inline: 12px;
     border-radius: 8px;
   }
   .faq-item [role='region'] > p {

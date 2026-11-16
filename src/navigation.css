@@ -1,6 +1,13 @@
 /* Keep the navigation above the artwork, including on touch browsers. */
 .site-header {
+  position: fixed;
+  inset: 0 0 auto;
   z-index: 100;
+}
+
+/* Let the starfield and hero atmosphere continue behind the floating pane. */
+.public-site .hero-v2 .hero-content {
+  padding-top: 108px;
 }
 
 @media (max-width: 900px) {
@@ -9,8 +16,8 @@
     scroll-padding-top: calc(var(--mobile-header-height) + 20px);
   }
 
-  #root {
-    padding-top: var(--mobile-header-height);
+  .public-site .hero-v2 .hero-content {
+    padding-top: calc(22px + var(--mobile-header-height));
   }
 
   .site-header {
@@ -75,5 +82,11 @@
   .reading-progress {
     top: env(safe-area-inset-top, 0px);
     height: 3px;
+  }
+}
+
+@media (max-width: 600px) {
+  .public-site .hero-v2 .hero-content {
+    padding-top: calc(18px + var(--mobile-header-height));
   }
 }
