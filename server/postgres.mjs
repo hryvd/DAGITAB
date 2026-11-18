@@ -1,6 +1,8 @@
 import { X509Certificate } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { getCACertificates } from 'node:tls';
 import postgres from 'postgres';
+import { supabaseProductionCa } from './supabase-ca.mjs';
 
 const columns = {
   teamid: 'teamId',
@@ -36,6 +38,17 @@ export function openPostgres(connectionString) {
       );
     }
     ssl.ca = ca;
+  }
+  const hostname = url.hostname.toLowerCase().replace(/\.$/, '');
+  if (
+    !url.searchParams.has('host') &&
+    (/^[a-z0-9-]+\.pooler\.supabase\.com$/.test(hostname) ||
+      /^db\.[a-z0-9]+\.supabase\.co$/.test(hostname))
+  ) {
+    ssl.ca = [
+      ...(ca ? [ca] : getCACertificates('default')),
+      supabaseProductionCa,
+    ];
   }
   const sql = postgres(url.href, {
     ssl,
