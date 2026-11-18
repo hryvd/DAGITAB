@@ -1,5 +1,6 @@
 import { resolve } from 'node:path';
 import { hashPassword, openDatabase } from './app.mjs';
+import { openPostgres } from './postgres.mjs';
 
 process.umask(0o077);
 const [emailArg, ...nameParts] = process.argv.slice(2);
@@ -36,23 +37,37 @@ if (!password) {
     .toString()
     .replace(/\r?\n$/, '');
 }
-const db = openDatabase(
-  process.env.DAGITAB_DB_PATH || resolve('.data/dagitab.sqlite'),
-);
+const connectionString = process.env.DATABASE_URL;
+const db = connectionString
+  ? openPostgres(connectionString)
+  : openDatabase(
+      process.env.DAGITAB_DB_PATH || resolve('.data/dagitab.sqlite'),
+    );
 try {
-  if (db.prepare('SELECT id FROM users WHERE email = ?').get(email))
+  if (await db.prepare('SELECT id FROM users WHERE email = ?').get(email))
     throw new Error(
       'An account already uses this email; no account was changed.',
     );
   const hash = await hashPassword(password);
   password = undefined;
-  db.prepare(
-    "INSERT INTO users (name,email,password,role,createdAt) VALUES (?,?,?,'admin',?)",
-  ).run(name, email, hash, Date.now());
+  await db
+    .prepare(
+      "INSERT INTO users (name,email,password,role,createdAt) VALUES (?,?,?,'admin',?)",
+    )
+    .run(name, email, hash, Date.now());
   console.log('Administrator created. Sign in through the app.');
 } catch (error) {
-  console.error(error.message);
+  if (error.code === '23505')
+    console.error(
+      'An account already uses this email; no account was changed.',
+    );
+  else if (connectionString && error.code)
+    console.error(
+      'Could not create the administrator in Postgres:',
+      error.code,
+    );
+  else console.error(error.message);
   process.exitCode = 1;
 } finally {
-  db.close();
+  await db.close();
 }

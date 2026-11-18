@@ -1,5 +1,5 @@
-// Vercel hosts the frontend and forwards accounts to a persistent Node server.
-// No database or credential is stored in the serverless function filesystem.
+import { createApp } from '../server/app.mjs';
+import { openPostgres } from '../server/postgres.mjs';
 const METHODS = [
   ['GET', /^\/api\/(?:session|teams|workspace)$/],
   ['POST', /^\/api\/(?:register|login|logout|projects|tasks)$/],
@@ -166,4 +166,33 @@ export function createProxy({
   };
 }
 
-export default createProxy();
+const proxy = createProxy();
+let app;
+
+export default async function handler(req, res) {
+  if (!process.env.DATABASE_URL) return proxy(req, res);
+  if (!req.url?.startsWith('/api/')) {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.statusCode = 404;
+    return res.end(JSON.stringify({ error: 'API route not found.' }));
+  }
+  if (!app) {
+    try {
+      const origin =
+        process.env.APP_ORIGIN ||
+        (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`);
+      app = createApp({
+        production: true,
+        origin,
+        database: openPostgres(process.env.DATABASE_URL),
+      });
+    } catch {
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.statusCode = 503;
+      return res.end(JSON.stringify({ error: unavailable }));
+    }
+  }
+  return app.handler(req, res);
+}

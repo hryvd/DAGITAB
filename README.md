@@ -17,9 +17,9 @@ npm run dev
 `npm run dev` starts Vite on **5173** and the API on **127.0.0.1:3001**, with `/api` requests proxied by Vite. Run it from the repository root. The writable cache path above is suitable for this cloud environment. Local data is stored in ignored `.data/dagitab.sqlite`; set `DAGITAB_DB_PATH` to use another persistent location. Live processes need restarting in future sessions; use the existing isolated checkout rather than creating a worktree.
 
 ```sh
+npm run build
 npm test
 npm run format:check
-npm run build
 ```
 
 The production frontend is generated in `dist/`. `npm run preview` only previews those static files; use `npm run dev` or the Node production server for working account and workspace APIs.
@@ -48,7 +48,7 @@ Sign-in accepts an email or provisioned username. Public registration still requ
 
 Passwords are salted and hashed with scrypt. Sessions use expiring HttpOnly cookies, CSRF tokens, and same-origin checks; production cookies also require HTTPS. The API checks team membership for task and project access. Team peers receive names and team membership; administrators can see registration email, school, expertise, and contribution details. The current release has no email verification or self-service password recovery.
 
-**SQLite data is not encrypted by the application.** Production needs an encrypted persistent volume, encrypted backups, and restricted host access. See [the deployment guide](docs/DEPLOYMENT.md) for HTTPS, database, and startup requirements. A static-only Vercel deployment cannot run the account or team workspace APIs. The included Vercel API bridge can connect the frontend to a separate persistent backend; configure it using the deployment guide. Local checks do not publish the site or push files to GitHub.
+**SQLite data is not encrypted by the application.** Production needs an encrypted persistent volume, encrypted backups, and restricted host access. See [the deployment guide](docs/DEPLOYMENT.md) for HTTPS, database, and startup requirements. A static-only Vercel deployment cannot run the account or team workspace APIs. Vercel can run the backend directly with Supabase Postgres using the deployment guide. Local checks do not publish the site or push files to GitHub.
 
 ## Content and branding
 
@@ -64,7 +64,7 @@ Passwords are salted and hashed with scrypt. Sessions use expiring HttpOnly cook
 - Batangas City is the main recipient LGU. Its featured card uses a geographic outline, rather than an official seal. `public/organizations/batangas-city-map.svg` preserves the city's mainland and Verde Island boundary from NAMRIA / PSA via OCHA COD-AB, adapted from [James Faeldon's Philippines JSON Maps](https://github.com/faeldon/philippines-json-maps/blob/bf7060598ff5a5d160917f1dcb9622dbaef85ff7/latest/geojson/provdists/medres/municities-provdist-401000000.0.01.json), under [CC BY 3.0 IGO](https://creativecommons.org/licenses/by/3.0/igo/). Source attribution and the derivative repository's MIT notice are preserved in the SVG metadata and this documentation.
 - `public/dagitab-event-brief.pdf` is the user-supplied source document. Fonts are bundled locally through Fontsource; no third-party moodboard images are used.
 
-Registration buttons open the app's own form. Account and task data stays in the configured SQLite database; protect that database and its backups as personal data.
+Registration buttons open the app's own form. Account and task data stays in the configured SQLite or Postgres database; protect that database and its backups as personal data.
 
 ## Date and event accuracy
 

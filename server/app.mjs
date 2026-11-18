@@ -210,15 +210,34 @@ const publicUser = (row) =>
 async function readJson(req) {
   if (!req.headers['content-type']?.startsWith('application/json'))
     throw new HttpError(415, 'Send JSON with Content-Type: application/json.');
-  let bytes = 0;
-  const chunks = [];
-  for await (const chunk of req) {
-    bytes += chunk.length;
-    if (bytes > 16_384) throw new HttpError(413, 'Request is too large.');
-    chunks.push(chunk);
-  }
+  const limit = 16_384;
+  if (Number(req.headers['content-length']) > limit)
+    throw new HttpError(413, 'Request is too large.');
+  let payload;
   try {
-    const data = JSON.parse(Buffer.concat(chunks).toString());
+    payload = req.body;
+  } catch {
+    throw new HttpError(400, 'Send a valid JSON object.');
+  }
+  if (payload === undefined) {
+    let bytes = 0;
+    const chunks = [];
+    for await (const chunk of req) {
+      const buffer = Buffer.from(chunk);
+      bytes += buffer.length;
+      if (bytes > limit) throw new HttpError(413, 'Request is too large.');
+      chunks.push(buffer);
+    }
+    payload = Buffer.concat(chunks);
+  }
+  const serialized =
+    Buffer.isBuffer(payload) || typeof payload === 'string'
+      ? payload
+      : JSON.stringify(payload);
+  if (Buffer.byteLength(serialized) > limit)
+    throw new HttpError(413, 'Request is too large.');
+  try {
+    const data = JSON.parse(serialized);
     if (!data || typeof data !== 'object' || Array.isArray(data))
       throw new Error();
     return data;
@@ -242,6 +261,7 @@ const contentTypes = {
 };
 
 export function createApp({
+  database,
   dbPath = resolve('.data/dagitab.sqlite'),
   production = false,
   origin,
@@ -255,8 +275,12 @@ export function createApp({
     throw new Error(
       'APP_ORIGIN must be an origin without a trailing slash or path.',
     );
-  requirePrivateStorage(dbPath, [distPath, resolve(repositoryRoot, 'public')]);
-  const db = openDatabase(dbPath);
+  if (!database)
+    requirePrivateStorage(dbPath, [
+      distPath,
+      resolve(repositoryRoot, 'public'),
+    ]);
+  const db = database || openDatabase(dbPath);
   const limits = new Map();
   const dummyPassword = `scrypt:32768:${'0'.repeat(32)}:${'0'.repeat(128)}`;
 
@@ -286,17 +310,25 @@ export function createApp({
     }
   }
 
-  function rateLimit(
+  async function rateLimit(
     req,
     kind,
     maximum,
     duration,
-    subject = req.socket.remoteAddress,
+    subject = database
+      ? req.headers['x-vercel-forwarded-for']?.split(',')[0].trim() ||
+        req.socket.remoteAddress
+      : req.socket.remoteAddress,
   ) {
+    const key = `${kind}:${digest(subject || 'unknown')}`;
+    if (database) {
+      if ((await database.rateLimit(key, duration)) > maximum)
+        throw new HttpError(429, 'Too many attempts. Please try again later.');
+      return;
+    }
     const now = Date.now();
     for (const [key, limit] of limits)
       if (limit.until <= now) limits.delete(key);
-    const key = `${kind}:${subject}`;
     const entry = limits.get(key) || { count: 0, until: now + duration };
     entry.count += 1;
     limits.set(key, entry);
@@ -304,48 +336,46 @@ export function createApp({
       throw new HttpError(429, 'Too many attempts. Please try again later.');
   }
 
-  function allTeams() {
+  async function allTeams() {
+    const rows = await db
+      .prepare(
+        `
+      SELECT teams.id, open, capacity, CAST(COUNT(users.id) AS INTEGER) AS count
+      FROM teams LEFT JOIN users ON users.teamId = teams.id AND users.role = 'member'
+      GROUP BY teams.id, open, capacity
+    `,
+      )
+      .all();
+    const settings = new Map(rows.map((row) => [row.id, row]));
     return teams.map((team) => {
-      const settings = db
-        .prepare('SELECT open, capacity FROM teams WHERE id = ?')
-        .get(team.id);
-      const { count } = db
-        .prepare(
-          "SELECT COUNT(*) AS count FROM users WHERE teamId = ? AND role = 'member'",
-        )
-        .get(team.id);
-      return {
-        ...team,
-        open: Boolean(settings.open),
-        capacity: settings.capacity,
-        memberCount: count,
-      };
+      const { open, capacity, count } = settings.get(team.id);
+      return { ...team, open: Boolean(open), capacity, memberCount: count };
     });
   }
 
-  function session(req, res, create = false) {
+  async function session(req, res, create = false) {
     const raw = /(?:^|;\s*)dagitab_session=([A-Za-z0-9_-]{43})(?:;|$)/.exec(
       req.headers.cookie || '',
     )?.[1];
     let current =
       raw &&
-      db
+      (await db
         .prepare('SELECT * FROM sessions WHERE tokenHash = ? AND expiresAt > ?')
-        .get(digest(raw), Date.now());
+        .get(digest(raw), Date.now()));
     if (current?.userId && !localDemoAllowed(req)) {
-      const account = db
+      const account = await db
         .prepare('SELECT localDemo FROM users WHERE id=?')
         .get(current.userId);
       if (account?.localDemo) {
-        db.prepare('DELETE FROM sessions WHERE tokenHash=?').run(
-          current.tokenHash,
-        );
+        await db
+          .prepare('DELETE FROM sessions WHERE tokenHash=?')
+          .run(current.tokenHash);
         current = null;
       }
     }
     if (!current && create) {
-      rateLimit(req, 'session', 200, HOUR);
-      current = newSession(res, null);
+      await rateLimit(req, 'session', 200, HOUR);
+      current = await newSession(res, null);
     }
     return current || null;
   }
@@ -357,7 +387,7 @@ export function createApp({
     );
   }
 
-  function newSession(res, userId) {
+  async function newSession(res, userId, previousTokenHash) {
     const raw = token();
     const value = {
       tokenHash: digest(raw),
@@ -365,21 +395,26 @@ export function createApp({
       userId,
       expiresAt: Date.now() + SESSION_AGE,
     };
-    db.prepare('DELETE FROM sessions WHERE expiresAt <= ?').run(Date.now());
-    db.prepare('INSERT INTO sessions VALUES (?, ?, ?, ?)').run(
-      value.tokenHash,
-      value.csrf,
-      value.userId,
-      value.expiresAt,
-    );
+    await db
+      .prepare('DELETE FROM sessions WHERE expiresAt <= ?')
+      .run(Date.now());
+    await db
+      .prepare('INSERT INTO sessions VALUES (?, ?, ?, ?)')
+      .run(value.tokenHash, value.csrf, value.userId, value.expiresAt);
+    if (previousTokenHash)
+      await db
+        .prepare('DELETE FROM sessions WHERE tokenHash = ?')
+        .run(previousTokenHash);
     setCookie(res, raw, SESSION_AGE / 1000);
     return value;
   }
 
-  function requireUser(current, req) {
+  async function requireUser(current, req) {
     const user =
       current?.userId &&
-      db.prepare('SELECT * FROM users WHERE id = ?').get(current.userId);
+      (await db
+        .prepare('SELECT * FROM users WHERE id = ?')
+        .get(current.userId));
     if (!user || (user.localDemo && !localDemoAllowed(req)))
       throw new HttpError(401, 'Please sign in to continue.');
     return user;
@@ -395,15 +430,15 @@ export function createApp({
       throw new HttpError(403, 'This resource belongs to another team.');
   }
 
-  function assignee(value, teamId) {
+  async function assignee(value, teamId) {
     if (value === null || value === undefined || value === '') return null;
     if (
       !Number.isSafeInteger(value) ||
-      !db
+      !(await db
         .prepare(
           "SELECT id FROM users WHERE id = ? AND teamId = ? AND role = 'member'",
         )
-        .get(value, teamId)
+        .get(value, teamId))
     )
       throw new HttpError(400, 'Choose a member of this team.');
     return value;
@@ -416,7 +451,7 @@ export function createApp({
     res.end(JSON.stringify(value));
   }
 
-  const server = createServer(async (req, res) => {
+  async function handler(req, res) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -436,7 +471,7 @@ export function createApp({
       const url = new URL(req.url, 'http://localhost');
       const path = url.pathname;
       const mutation = !['GET', 'HEAD'].includes(req.method);
-      let current = session(req, res);
+      let current = await session(req, res);
       if (path.startsWith('/api/')) {
         if (mutation) {
           const expected = origin || `http://${req.headers.host}`;
@@ -456,19 +491,21 @@ export function createApp({
             );
         }
         if (req.method === 'GET' && path === '/api/session') {
-          current ||= session(req, res, true);
+          current ||= await session(req, res, true);
           const user =
             current.userId &&
-            db.prepare('SELECT * FROM users WHERE id = ?').get(current.userId);
+            (await db
+              .prepare('SELECT * FROM users WHERE id = ?')
+              .get(current.userId));
           return send(res, 200, {
             user: publicUser(user) || null,
             csrfToken: current.csrf,
           });
         }
         if (req.method === 'GET' && path === '/api/teams')
-          return send(res, 200, { teams: allTeams() });
+          return send(res, 200, { teams: await allTeams() });
         if (req.method === 'POST' && path === '/api/register') {
-          rateLimit(req, 'register', 10, HOUR);
+          await rateLimit(req, 'register', 10, HOUR);
           const body = await readJson(req);
           const name = text(body.name, 'Name', 2, 100);
           const email = text(body.email, 'Email', 3, 254).toLowerCase();
@@ -493,23 +530,22 @@ export function createApp({
           ];
           const intent = text(body.intent || '', 'Your contribution', 0, 1000);
           const password = await hashPassword(body.password);
-          // Recheck capacity after password hashing, before the synchronous insert.
-          const team = allTeams().find((item) => item.id === body.teamId);
-          if (
-            !team.open ||
-            (team.capacity !== null && team.memberCount >= team.capacity)
-          )
-            throw new HttpError(
-              409,
-              'This team is not accepting registrations right now.',
-            );
-          let result;
+          let registered;
           try {
-            result = db
+            registered = await db
               .prepare(
-                "INSERT INTO users (name,email,password,school,teamId,expertise,intent,role,createdAt) VALUES (?,?,?,?,?,?,?,'member',?)",
+                `
+              INSERT INTO users (name,email,password,school,teamId,expertise,intent,role,createdAt)
+              SELECT ?,?,?,?,?,?,?,'member',?
+              FROM teams WHERE id = ? AND open = 1 AND (
+                capacity IS NULL OR capacity > (
+                  SELECT COUNT(*) FROM users WHERE teamId = teams.id AND role = 'member'
+                )
               )
-              .run(
+              RETURNING *
+            `,
+              )
+              .get(
                 name,
                 email,
                 password,
@@ -518,33 +554,37 @@ export function createApp({
                 JSON.stringify(expertise),
                 intent,
                 Date.now(),
+                body.teamId,
               );
           } catch (error) {
             if (
-              error.code === 'ERR_SQLITE_ERROR' &&
-              error.message.includes('UNIQUE')
+              error.code === '23505' ||
+              (error.code === 'ERR_SQLITE_ERROR' &&
+                error.message.includes('UNIQUE'))
             )
               throw new HttpError(
                 409,
                 'Unable to register with these details. Try signing in or use another email.',
               );
-            throw error;
+            if (
+              error.code !== 'P0001' ||
+              error.message !== 'dagitab_team_closed'
+            )
+              throw error;
           }
-          db.prepare('DELETE FROM sessions WHERE tokenHash = ?').run(
-            current.tokenHash,
-          );
-          current = newSession(res, Number(result.lastInsertRowid));
+          if (!registered)
+            throw new HttpError(
+              409,
+              'This team is not accepting registrations right now.',
+            );
+          current = await newSession(res, registered.id, current.tokenHash);
           return send(res, 201, {
-            user: publicUser(
-              db
-                .prepare('SELECT * FROM users WHERE id = ?')
-                .get(current.userId),
-            ),
+            user: publicUser(registered),
             csrfToken: current.csrf,
           });
         }
         if (req.method === 'POST' && path === '/api/login') {
-          rateLimit(req, 'login', 30, 15 * 60_000);
+          await rateLimit(req, 'login', 30, 15 * 60_000);
           const body = await readJson(req);
           const identifier = text(
             body.identifier ?? body.email,
@@ -556,8 +596,8 @@ export function createApp({
             typeof body.password === 'string' && body.password.length <= 128
               ? body.password
               : '';
-          rateLimit(req, 'login-account', 10, 15 * 60_000, identifier);
-          const user = db
+          await rateLimit(req, 'login-account', 10, 15 * 60_000, identifier);
+          const user = await db
             .prepare(
               'SELECT * FROM users WHERE email = ? OR lower(username) = ?',
             )
@@ -571,51 +611,49 @@ export function createApp({
               401,
               'Email, username, or password is incorrect.',
             );
-          db.prepare('DELETE FROM sessions WHERE tokenHash = ?').run(
-            current.tokenHash,
-          );
-          current = newSession(res, user.id);
+          current = await newSession(res, user.id, current.tokenHash);
           return send(res, 200, {
             user: publicUser(user),
             csrfToken: current.csrf,
           });
         }
         if (req.method === 'POST' && path === '/api/logout') {
-          db.prepare('DELETE FROM sessions WHERE tokenHash = ?').run(
-            current.tokenHash,
-          );
+          await db
+            .prepare('DELETE FROM sessions WHERE tokenHash = ?')
+            .run(current.tokenHash);
           setCookie(res, '', 0);
           return send(res, 200, { user: null });
         }
-        const user = requireUser(current, req);
+        const user = await requireUser(current, req);
         if (req.method === 'GET' && path === '/api/workspace') {
           const params = user.role === 'admin' ? [] : [user.teamId];
           const where = user.role === 'admin' ? '' : ' WHERE teamId = ?';
           const members =
             user.role === 'admin'
-              ? db
-                  .prepare(
-                    "SELECT id,name,email,school,teamId,expertise,intent FROM users WHERE role='member' ORDER BY name",
-                  )
-                  .all()
-                  .map((member) => ({
-                    ...member,
-                    expertise: JSON.parse(member.expertise),
-                  }))
-              : db
+              ? (
+                  await db
+                    .prepare(
+                      "SELECT id,name,email,school,teamId,expertise,intent FROM users WHERE role='member' ORDER BY name",
+                    )
+                    .all()
+                ).map((member) => ({
+                  ...member,
+                  expertise: JSON.parse(member.expertise),
+                }))
+              : await db
                   .prepare(
                     "SELECT id,name,teamId FROM users WHERE teamId=? AND role='member' ORDER BY name",
                   )
                   .all(user.teamId);
           return send(res, 200, {
-            projects: db
+            projects: await db
               .prepare(`SELECT * FROM projects${where} ORDER BY id DESC`)
               .all(...params),
-            tasks: db
+            tasks: await db
               .prepare(`SELECT * FROM tasks${where} ORDER BY id DESC`)
               .all(...params),
             members,
-            teams: allTeams(),
+            teams: await allTeams(),
           });
         }
         if (req.method === 'POST' && path === '/api/projects') {
@@ -633,24 +671,22 @@ export function createApp({
           const status = body.status || 'planned';
           if (!projectStatuses.has(status))
             throw new HttpError(400, 'Choose a valid project status.');
-          const result = db
+          const result = await db
             .prepare(
-              'INSERT INTO projects (title,description,teamId,status) VALUES (?,?,?,?)',
+              'INSERT INTO projects (title,description,teamId,status) VALUES (?,?,?,?) RETURNING *',
             )
-            .run(title, description, body.teamId, status);
+            .get(title, description, body.teamId, status);
           return send(res, 201, {
-            project: db
-              .prepare('SELECT * FROM projects WHERE id = ?')
-              .get(Number(result.lastInsertRowid)),
+            project: result,
           });
         }
         if (req.method === 'POST' && path === '/api/tasks') {
           const body = await readJson(req);
           const project =
             Number.isSafeInteger(body.projectId) &&
-            db
+            (await db
               .prepare('SELECT * FROM projects WHERE id = ?')
-              .get(body.projectId);
+              .get(body.projectId));
           if (!project) throw new HttpError(404, 'Project not found.');
           requireTeam(user, project.teamId);
           const title = text(body.title, 'Task title', 2, 160);
@@ -663,12 +699,12 @@ export function createApp({
           const status = body.status || 'todo';
           if (!taskStatuses.has(status))
             throw new HttpError(400, 'Choose a valid task status.');
-          const assigned = assignee(body.assigneeId, project.teamId);
-          const result = db
+          const assigned = await assignee(body.assigneeId, project.teamId);
+          const result = await db
             .prepare(
-              'INSERT INTO tasks (projectId,title,description,teamId,assigneeId,status,createdBy) VALUES (?,?,?,?,?,?,?)',
+              'INSERT INTO tasks (projectId,title,description,teamId,assigneeId,status,createdBy) VALUES (?,?,?,?,?,?,?) RETURNING *',
             )
-            .run(
+            .get(
               project.id,
               title,
               description,
@@ -678,15 +714,13 @@ export function createApp({
               user.id,
             );
           return send(res, 201, {
-            task: db
-              .prepare('SELECT * FROM tasks WHERE id = ?')
-              .get(Number(result.lastInsertRowid)),
+            task: result,
           });
         }
         const projectMatch = /^\/api\/projects\/(\d+)$/.exec(path);
         if (req.method === 'PATCH' && projectMatch) {
           requireAdmin(user);
-          const project = db
+          const project = await db
             .prepare('SELECT * FROM projects WHERE id = ?')
             .get(Number(projectMatch[1]));
           if (!project) throw new HttpError(404, 'Project not found.');
@@ -703,18 +737,20 @@ export function createApp({
             body.status === undefined ? project.status : body.status;
           if (!projectStatuses.has(status))
             throw new HttpError(400, 'Choose a valid project status.');
-          db.prepare(
-            'UPDATE projects SET title=?, description=?, status=? WHERE id=?',
-          ).run(title, description, status, project.id);
+          await db
+            .prepare(
+              'UPDATE projects SET title=?, description=?, status=? WHERE id=?',
+            )
+            .run(title, description, status, project.id);
           return send(res, 200, {
-            project: db
+            project: await db
               .prepare('SELECT * FROM projects WHERE id = ?')
               .get(project.id),
           });
         }
         const taskMatch = /^\/api\/tasks\/(\d+)$/.exec(path);
         if (req.method === 'PATCH' && taskMatch) {
-          const task = db
+          const task = await db
             .prepare('SELECT * FROM tasks WHERE id = ?')
             .get(Number(taskMatch[1]));
           if (!task) throw new HttpError(404, 'Task not found.');
@@ -734,12 +770,16 @@ export function createApp({
           const assigned =
             body.assigneeId === undefined
               ? task.assigneeId
-              : assignee(body.assigneeId, task.teamId);
-          db.prepare(
-            'UPDATE tasks SET title=?,description=?,status=?,assigneeId=? WHERE id=?',
-          ).run(title, description, status, assigned, task.id);
+              : await assignee(body.assigneeId, task.teamId);
+          await db
+            .prepare(
+              'UPDATE tasks SET title=?,description=?,status=?,assigneeId=? WHERE id=?',
+            )
+            .run(title, description, status, assigned, task.id);
           return send(res, 200, {
-            task: db.prepare('SELECT * FROM tasks WHERE id=?').get(task.id),
+            task: await db
+              .prepare('SELECT * FROM tasks WHERE id=?')
+              .get(task.id),
           });
         }
         const teamMatch = /^\/api\/teams\/([a-z]+)$/.exec(path);
@@ -748,7 +788,9 @@ export function createApp({
           if (!teamIds.has(teamMatch[1]))
             throw new HttpError(404, 'Team not found.');
           const body = await readJson(req);
-          const team = allTeams().find((item) => item.id === teamMatch[1]);
+          const team = (await allTeams()).find(
+            (item) => item.id === teamMatch[1],
+          );
           const open = body.open === undefined ? team.open : body.open;
           const capacity =
             body.capacity === undefined ? team.capacity : body.capacity;
@@ -763,12 +805,30 @@ export function createApp({
               400,
               'Capacity must be unlimited or a whole number at least as large as current membership (maximum 10000).',
             );
-          db.prepare('UPDATE teams SET open=?,capacity=? WHERE id=?').run(
-            Number(open),
-            capacity,
-            team.id,
-          );
-          return send(res, 200, { teams: allTeams() });
+          let updated;
+          try {
+            updated = await db
+              .prepare(
+                `
+              UPDATE teams SET open=?, capacity=? WHERE id=? AND (
+                CAST(? AS INTEGER) IS NULL OR CAST(? AS INTEGER) >= (SELECT COUNT(*) FROM users WHERE teamId = teams.id AND role = 'member')
+              ) RETURNING id
+            `,
+              )
+              .get(Number(open), capacity, team.id, capacity, capacity);
+          } catch (error) {
+            if (
+              error.code !== 'P0001' ||
+              error.message !== 'dagitab_team_capacity'
+            )
+              throw error;
+          }
+          if (!updated)
+            throw new HttpError(
+              409,
+              'Team membership changed. Refresh and try again.',
+            );
+          return send(res, 200, { teams: await allTeams() });
         }
         throw new HttpError(404, 'API route not found.');
       }
@@ -805,26 +865,33 @@ export function createApp({
       res.end(req.method === 'HEAD' ? undefined : body);
     } catch (error) {
       if (!(error instanceof HttpError))
-        console.error('Request failed:', error.message);
+        console.error(
+          'Request failed:',
+          database ? error.code || error.name : error.message,
+        );
       if (!res.headersSent)
-        send(res, error.status || 500, {
-          error: error.status
-            ? error.message
-            : 'Something went wrong. Please try again.',
+        send(res, error instanceof HttpError ? error.status : 500, {
+          error:
+            error instanceof HttpError
+              ? error.message
+              : 'Something went wrong. Please try again.',
         });
       else res.end();
     }
-  });
+  }
+  const server = createServer(handler);
   server.requestTimeout = 15_000;
   server.headersTimeout = 10_000;
   return {
     server,
+    handler,
     db,
     close: () =>
       new Promise((resolveClose, reject) =>
         server.close((error) => {
-          db.close();
-          error ? reject(error) : resolveClose();
+          Promise.resolve()
+            .then(() => db.close())
+            .then(() => (error ? reject(error) : resolveClose()), reject);
         }),
       ),
   };

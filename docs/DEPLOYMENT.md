@@ -1,10 +1,18 @@
 # Deploy DAGITAB
 
-DAGITAB needs a **Node.js 24 server and persistent SQLite storage** for accounts, team availability, projects, and tasks. You can host the whole app on that server, or keep the frontend on Vercel and connect its `/api` function to the persistent backend. Browser requests always use the frontend's HTTPS origin. Both arrangements support direct navigation to `/register`, `/teams`, `/login`, `/admin/login`, and `/dashboard`.
+## Vercel with Supabase Postgres
 
-Serving only `dist/` cannot provide accounts or persistent team workspaces. Do not create a SQLite database in a Vercel function: its filesystem is ephemeral and cannot retain registrations safely.
+Vercel serves the Vite frontend and runs the account and workspace API. The browser sends requests to the same-origin `/api` routes. Only the server-side function connects to Postgres.
 
-## Vercel frontend with a persistent backend
+1. In the target Supabase project's SQL Editor, run [the DAGITAB migration](../supabase/migrations/20261118000000_dagitab.sql). It creates the private `dagitab` schema and seeds the six team definitions. For an existing SQLite deployment, plan a separate data migration before switching live traffic. The schema migration does not copy registrations, accounts, projects, or tasks.
+2. In Vercel's production environment variables, set `DATABASE_URL` to the Supabase **Transaction pooler** URI from **Connect**, using port 6543 and the URL-encoded database password. The function verifies TLS certificates and disables named prepared statements. Keep this variable server-side. Use an isolated database for previews that need working accounts.
+3. Set `APP_ORIGIN` to the exact public HTTPS origin, for example `https://www.dagitab.xyz`. Deploy with the Vite preset and Node.js 24. Requests for mutations must originate from the configured site. When `APP_ORIGIN` is absent, the function uses the Vercel deployment hostname.
+4. To provision an administrator, run the administrator command below from a trusted terminal with `DATABASE_URL` securely supplied to its process. Omit the `DAGITAB_DB_PATH` override for Postgres.
+5. Verify `/api/teams` returns six teams. Register a disposable account, sign out and back in, then confirm the account and workspace still exist after a redeploy.
+
+The standalone Node server and local development continue to use SQLite. The legacy proxy is available for existing Vercel configurations that set only `DAGITAB_API_ORIGIN`. When `DATABASE_URL` is present, the Vercel function uses Postgres.
+
+## Legacy Vercel frontend with a persistent SQLite backend
 
 1. Deploy the Node application on a host with the persistent, encrypted storage and HTTPS configuration described below. Provision the administrator on that host using its persistent database.
 2. On the backend, set `NODE_ENV=production` and `APP_ORIGIN=https://www.dagitab.xyz` (or the exact public frontend origin). The proxy preserves this browser Origin for CSRF validation. Keep one canonical frontend origin; redirect alternate domains to it.
@@ -22,9 +30,9 @@ From the repository root:
 
 ```sh
 npm ci --cache /workspace/.npm-cache --no-audit --no-fund
+npm run build
 npm test
 npm run format:check
-npm run build
 ```
 
 The cache directory is for the Codex cloud workspace; choose a writable cache on another host. `npm run dev` starts the local API on 3001 and Vite on 5173. `npm run preview` is a static frontend preview, not a full application server.
