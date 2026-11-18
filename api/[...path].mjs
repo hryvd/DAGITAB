@@ -167,32 +167,66 @@ export function createProxy({
 }
 
 const proxy = createProxy();
-let app;
+let accountService;
+
+function setupUnavailable(res, code, error) {
+  // Driver messages may include connection details. Emit only the error code.
+  console.error('Account service startup:', code, error?.code || '');
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.statusCode = 503;
+  return res.end(JSON.stringify({ error: unavailable, code }));
+}
 
 export default async function handler(req, res) {
-  if (!process.env.DATABASE_URL) return proxy(req, res);
   if (!req.url?.startsWith('/api/')) {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.statusCode = 404;
     return res.end(JSON.stringify({ error: 'API route not found.' }));
   }
-  if (!app) {
+
+  if (!accountService) {
+    const connectionString =
+      process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
+    if (!connectionString) {
+      if (process.env.DAGITAB_API_ORIGIN) return proxy(req, res);
+      return setupUnavailable(res, 'ACCOUNT_DATABASE_URL_MISSING');
+    }
+
+    let origin;
+    const configuredOrigin = process.env.APP_ORIGIN?.trim();
     try {
-      const origin =
-        process.env.APP_ORIGIN ||
-        (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`);
-      app = createApp({
+      if (configuredOrigin) {
+        const url = new URL(configuredOrigin);
+        if (url.protocol !== 'https:' || url.username || url.password)
+          return setupUnavailable(res, 'ACCOUNT_APP_ORIGIN_INVALID');
+        origin = url.origin;
+      } else if (!process.env.VERCEL) {
+        return setupUnavailable(res, 'ACCOUNT_APP_ORIGIN_MISSING');
+      }
+    } catch {
+      return setupUnavailable(res, 'ACCOUNT_APP_ORIGIN_INVALID');
+    }
+
+    try {
+      const database = openPostgres(connectionString);
+      const app = createApp({
         production: true,
         origin,
-        database: openPostgres(process.env.DATABASE_URL),
+        useRequestHost: Boolean(process.env.VERCEL),
+        database,
       });
-    } catch {
-      res.setHeader('Cache-Control', 'no-store');
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.statusCode = 503;
-      return res.end(JSON.stringify({ error: unavailable }));
+      accountService = { app, database };
+    } catch (error) {
+      return setupUnavailable(res, 'ACCOUNT_DATABASE_URL_INVALID', error);
     }
   }
-  return app.handler(req, res);
+
+  try {
+    await accountService.database.initialize();
+  } catch (error) {
+    return setupUnavailable(res, 'ACCOUNT_DATABASE_UNAVAILABLE', error);
+  }
+  return accountService.app.handler(req, res);
 }

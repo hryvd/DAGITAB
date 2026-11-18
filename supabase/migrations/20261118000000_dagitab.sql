@@ -1,5 +1,8 @@
 BEGIN;
 
+-- Serialize with Vercel's first-use initialization.
+SELECT pg_advisory_xact_lock(20261118, 1);
+
 CREATE SCHEMA IF NOT EXISTS dagitab;
 REVOKE ALL ON SCHEMA dagitab FROM PUBLIC, anon, authenticated;
 

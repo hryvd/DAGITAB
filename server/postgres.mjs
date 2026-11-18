@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import postgres from 'postgres';
 
 const columns = {
@@ -28,7 +29,49 @@ export function openPostgres(connectionString) {
     transform: { column: { from: (name) => columns[name] ?? name } },
   });
 
+  let initialization;
+
+  async function schemaReady(connection) {
+    const [row] = await connection`
+      SELECT EXISTS (
+        SELECT 1
+        FROM pg_catalog.pg_class AS relation
+        JOIN pg_catalog.pg_namespace AS schema ON schema.oid = relation.relnamespace
+        WHERE schema.nspname = 'dagitab' AND relation.relname = 'rate_limits'
+      ) AS ready
+    `;
+    return row.ready;
+  }
+
+  async function initializeSchema() {
+    if (await schemaReady(sql)) return;
+    const migration = await readFile(
+      new URL(
+        '../supabase/migrations/20261118000000_dagitab.sql',
+        import.meta.url,
+      ),
+      'utf8',
+    );
+    // The file also runs in the SQL Editor. The driver owns the transaction here.
+    const statements = migration
+      .replace(/^BEGIN;\s*/, '')
+      .replace(/\s*COMMIT;\s*$/, '');
+    await sql.begin(async (transaction) => {
+      await transaction`SET LOCAL lock_timeout = '8s'`;
+      await transaction`SELECT pg_advisory_xact_lock(20261118, 1)`;
+      if (!(await schemaReady(transaction)))
+        await transaction.unsafe(statements);
+    });
+  }
+
   return {
+    initialize() {
+      initialization ??= initializeSchema().catch((error) => {
+        initialization = undefined;
+        throw error;
+      });
+      return initialization;
+    },
     prepare(statement) {
       let index = 0;
       const query = statement

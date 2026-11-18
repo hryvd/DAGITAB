@@ -44,6 +44,7 @@ const db = connectionString
       process.env.DAGITAB_DB_PATH || resolve('.data/dagitab.sqlite'),
     );
 try {
+  await db.initialize?.();
   if (await db.prepare('SELECT id FROM users WHERE email = ?').get(email))
     throw new Error(
       'An account already uses this email; no account was changed.',

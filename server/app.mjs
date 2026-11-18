@@ -265,9 +265,13 @@ export function createApp({
   dbPath = resolve('.data/dagitab.sqlite'),
   production = false,
   origin,
+  useRequestHost = false,
   distPath = fileURLToPath(new URL('../dist', import.meta.url)),
 } = {}) {
-  if (production && (!origin || new URL(origin).protocol !== 'https:'))
+  if (
+    production &&
+    (origin ? new URL(origin).protocol !== 'https:' : !useRequestHost)
+  )
     throw new Error(
       'Production requires APP_ORIGIN set to the public HTTPS origin.',
     );
@@ -474,7 +478,8 @@ export function createApp({
       let current = await session(req, res);
       if (path.startsWith('/api/')) {
         if (mutation) {
-          const expected = origin || `http://${req.headers.host}`;
+          const expected =
+            origin || `${production ? 'https' : 'http'}://${req.headers.host}`;
           if (
             req.headers.origin !== expected ||
             req.headers['sec-fetch-site'] === 'cross-site'
