@@ -6,7 +6,6 @@
   "outputDirectory": "dist",
   "functions": {
     "api/**": {
-      "maxDuration": 30,
       "includeFiles": "supabase/migrations/20261118000000_dagitab.sql"
     }
   },

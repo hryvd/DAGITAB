@@ -1,7 +1,5 @@
 import { createApp } from '../server/app.mjs';
 import { openPostgres } from '../server/postgres.mjs';
-import { openSheets } from '../server/sheets.mjs';
-import { createSheetsHandler } from '../server/sheets-api.mjs';
 const METHODS = [
   ['GET', /^\/api\/(?:session|teams|workspace)$/],
   ['POST', /^\/api\/(?:register|login|logout|projects|tasks)$/],
@@ -173,11 +171,7 @@ let accountService;
 
 function setupUnavailable(res, code, error) {
   // Driver messages may include connection details. Emit only the error code.
-  console.error(
-    'Account service startup:',
-    code,
-    error?.code || (typeof error?.cause === 'string' ? error.cause : ''),
-  );
+  console.error('Account service startup:', code, error?.code || '');
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.statusCode = 503;
@@ -193,10 +187,9 @@ export default async function handler(req, res) {
   }
 
   if (!accountService) {
-    const sheets = process.env.DAGITAB_DATABASE === 'google-sheets';
     const connectionString =
       process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
-    if (!sheets && !connectionString) {
+    if (!connectionString) {
       if (process.env.DAGITAB_API_ORIGIN) return proxy(req, res);
       return setupUnavailable(res, 'ACCOUNT_DATABASE_URL_MISSING');
     }
@@ -216,41 +209,17 @@ export default async function handler(req, res) {
       return setupUnavailable(res, 'ACCOUNT_APP_ORIGIN_INVALID');
     }
 
-    const options = {
-      production: true,
-      origin,
-      useRequestHost: Boolean(process.env.VERCEL),
-    };
     try {
-      if (sheets) {
-        accountService = {
-          sheetsHandler: createSheetsHandler(openSheets(), options),
-        };
-      } else {
-        const database = openPostgres(connectionString);
-        const app = createApp({
-          ...options,
-          database,
-        });
-        accountService = { app, database };
-      }
+      const database = openPostgres(connectionString);
+      const app = createApp({
+        production: true,
+        origin,
+        useRequestHost: Boolean(process.env.VERCEL),
+        database,
+      });
+      accountService = { app, database };
     } catch (error) {
-      return setupUnavailable(
-        res,
-        sheets
-          ? 'ACCOUNT_SHEETS_CONFIG_INVALID'
-          : 'ACCOUNT_DATABASE_URL_INVALID',
-        error,
-      );
-    }
-  }
-
-  if (accountService.sheetsHandler) {
-    try {
-      return await accountService.sheetsHandler(req, res);
-    } catch (error) {
-      if (res.headersSent) return res.end();
-      return setupUnavailable(res, 'ACCOUNT_SHEETS_UNAVAILABLE', error);
+      return setupUnavailable(res, 'ACCOUNT_DATABASE_URL_INVALID', error);
     }
   }
 
