@@ -1,3 +1,4 @@
+import { X509Certificate } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import postgres from 'postgres';
 
@@ -20,8 +21,24 @@ export function openPostgres(connectionString) {
   // Require certificate verification even when the pooler URI says sslmode=require.
   url.searchParams.delete('sslmode');
   url.searchParams.delete('ssl');
+  const ssl = { rejectUnauthorized: true };
+  const ca = process.env.DATABASE_CA_CERT?.replaceAll('\\n', '\n').trim();
+  if (ca) {
+    try {
+      if (!new X509Certificate(ca).ca)
+        throw new Error('Expected a CA certificate.');
+    } catch {
+      throw Object.assign(
+        new Error('DATABASE_CA_CERT must contain a PEM CA certificate.'),
+        {
+          code: 'DATABASE_CA_CERT_INVALID',
+        },
+      );
+    }
+    ssl.ca = ca;
+  }
   const sql = postgres(url.href, {
-    ssl: { rejectUnauthorized: true },
+    ssl,
     prepare: false,
     max: 2,
     connect_timeout: 5,

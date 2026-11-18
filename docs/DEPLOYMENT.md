@@ -10,6 +10,8 @@ Vercel serves the Vite frontend and runs the account and workspace API. The brow
 4. To provision an administrator, run the administrator command below from a trusted terminal with `DATABASE_URL` securely supplied to its process. Omit the `DAGITAB_DB_PATH` override for Postgres.
 5. Verify `/api/teams` returns six teams. If it returns a 503, use its setup code and the Vercel function logs to distinguish a missing variable from a database startup failure. Register a disposable account, sign out and back in, then confirm the account and workspace still exist after a redeploy.
 
+If the API returns `ACCOUNT_DATABASE_TLS_UNTRUSTED`, open **Supabase → Database → Settings → SSL Configuration → Download Certificate**. Paste the full downloaded PEM certificate, including the BEGIN and END lines, into `DATABASE_CA_CERT` in Vercel's **Production** environment variables. Redeploy from the latest revision. DAGITAB uses that CA to verify the database's certificate and hostname.
+
 The standalone Node server and local development continue to use SQLite. The legacy proxy is available for existing Vercel configurations that set only `DAGITAB_API_ORIGIN`. When `DATABASE_URL` is present, the Vercel function uses Postgres.
 
 ## Legacy Vercel frontend with a persistent SQLite backend

@@ -168,6 +168,13 @@ export function createProxy({
 
 const proxy = createProxy();
 let accountService;
+const untrustedCertificateErrors = new Set([
+  'DEPTH_ZERO_SELF_SIGNED_CERT',
+  'SELF_SIGNED_CERT_IN_CHAIN',
+  'UNABLE_TO_GET_ISSUER_CERT',
+  'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',
+  'UNABLE_TO_VERIFY_LEAF_SIGNATURE',
+]);
 
 function setupUnavailable(res, code, error) {
   // Driver messages may include connection details. Emit only the error code.
@@ -219,14 +226,26 @@ export default async function handler(req, res) {
       });
       accountService = { app, database };
     } catch (error) {
-      return setupUnavailable(res, 'ACCOUNT_DATABASE_URL_INVALID', error);
+      return setupUnavailable(
+        res,
+        error.code === 'DATABASE_CA_CERT_INVALID'
+          ? 'ACCOUNT_DATABASE_CA_CERT_INVALID'
+          : 'ACCOUNT_DATABASE_URL_INVALID',
+        error,
+      );
     }
   }
 
   try {
     await accountService.database.initialize();
   } catch (error) {
-    return setupUnavailable(res, 'ACCOUNT_DATABASE_UNAVAILABLE', error);
+    return setupUnavailable(
+      res,
+      untrustedCertificateErrors.has(error.code)
+        ? 'ACCOUNT_DATABASE_TLS_UNTRUSTED'
+        : 'ACCOUNT_DATABASE_UNAVAILABLE',
+      error,
+    );
   }
   return accountService.app.handler(req, res);
 }
