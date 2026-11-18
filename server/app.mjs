@@ -207,7 +207,7 @@ const publicUser = (row) =>
     role: row.role,
   };
 
-async function readJson(req) {
+export async function readJson(req) {
   if (!req.headers['content-type']?.startsWith('application/json'))
     throw new HttpError(415, 'Send JSON with Content-Type: application/json.');
   const limit = 16_384;

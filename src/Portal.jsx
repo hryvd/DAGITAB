@@ -68,7 +68,7 @@ async function api(path, options = {}) {
       'X-CSRF-Token': csrfToken,
       ...options.headers,
     },
-    signal: AbortSignal.timeout(12000),
+    signal: AbortSignal.timeout(25000),
     ...(options.body ? { body: JSON.stringify(options.body) } : {}),
   });
   if (!response.headers.get('content-type')?.includes('application/json')) {

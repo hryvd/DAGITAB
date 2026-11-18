@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import { hashPassword, openDatabase } from './app.mjs';
 import { openPostgres } from './postgres.mjs';
+import { openSheets, withSheetsDatabase } from './sheets.mjs';
 
 process.umask(0o077);
 const [emailArg, ...nameParts] = process.argv.slice(2);
@@ -38,31 +39,41 @@ if (!password) {
     .replace(/\r?\n$/, '');
 }
 const connectionString = process.env.DATABASE_URL;
-const db = connectionString
-  ? openPostgres(connectionString)
-  : openDatabase(
-      process.env.DAGITAB_DB_PATH || resolve('.data/dagitab.sqlite'),
-    );
+const sheets = process.env.DAGITAB_DATABASE === 'google-sheets';
+let database;
 try {
-  await db.initialize?.();
-  if (await db.prepare('SELECT id FROM users WHERE email = ?').get(email))
-    throw new Error(
-      'An account already uses this email; no account was changed.',
-    );
   const hash = await hashPassword(password);
   password = undefined;
-  await db
-    .prepare(
-      "INSERT INTO users (name,email,password,role,createdAt) VALUES (?,?,?,'admin',?)",
-    )
-    .run(name, email, hash, Date.now());
+  async function createAdministrator(db) {
+    if (await db.prepare('SELECT id FROM users WHERE email = ?').get(email))
+      throw new Error(
+        'An account already uses this email; no account was changed.',
+      );
+    await db
+      .prepare(
+        "INSERT INTO users (name,email,password,role,createdAt) VALUES (?,?,?,'admin',?)",
+      )
+      .run(name, email, hash, Date.now());
+  }
+
+  if (sheets) {
+    await withSheetsDatabase(openSheets(), createAdministrator);
+  } else {
+    database = connectionString
+      ? openPostgres(connectionString)
+      : openDatabase(
+          process.env.DAGITAB_DB_PATH || resolve('.data/dagitab.sqlite'),
+        );
+    await database.initialize?.();
+    await createAdministrator(database);
+  }
   console.log('Administrator created. Sign in through the app.');
 } catch (error) {
   if (error.code === '23505')
     console.error(
       'An account already uses this email; no account was changed.',
     );
-  else if (connectionString && error.code)
+  else if (connectionString && !sheets && error.code)
     console.error(
       'Could not create the administrator in Postgres:',
       error.code,
@@ -70,5 +81,5 @@ try {
   else console.error(error.message);
   process.exitCode = 1;
 } finally {
-  await db.close();
+  await database?.close();
 }

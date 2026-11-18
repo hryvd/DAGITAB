@@ -1,5 +1,9 @@
 # Deploy DAGITAB
 
+## Vercel with Google Sheets
+
+Use [the Google Sheets setup guide](GOOGLE-SHEETS.md) to store accounts, sessions, team settings, projects, and tasks in a private spreadsheet through Google Apps Script.
+
 ## Vercel with Supabase Postgres
 
 Vercel serves the Vite frontend and runs the account and workspace API. The browser sends requests to the same-origin `/api` routes. Only the server-side function connects to Postgres.
@@ -10,7 +14,7 @@ Vercel serves the Vite frontend and runs the account and workspace API. The brow
 4. To provision an administrator, run the administrator command below from a trusted terminal with `DATABASE_URL` securely supplied to its process. Omit the `DAGITAB_DB_PATH` override for Postgres.
 5. Verify `/api/teams` returns six teams. If it returns a 503, use its setup code and the Vercel function logs to distinguish a missing variable from a database startup failure. Register a disposable account, sign out and back in, then confirm the account and workspace still exist after a redeploy.
 
-The standalone Node server and local development continue to use SQLite. The legacy proxy is available for existing Vercel configurations that set only `DAGITAB_API_ORIGIN`. When `DATABASE_URL` is present, the Vercel function uses Postgres.
+The standalone Node server and local development continue to use SQLite. The legacy proxy is available for existing Vercel configurations that set only `DAGITAB_API_ORIGIN`. Without Google Sheets mode, the Vercel function uses Postgres when `DATABASE_URL` or `POSTGRES_URL` is present.
 
 ## Legacy Vercel frontend with a persistent SQLite backend
 
