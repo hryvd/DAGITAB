@@ -168,6 +168,8 @@ function Constellation() {
   );
 }
 function PortalHeader({ user, onLogout, path }) {
+  const workspacePath =
+    user?.role === 'admin' ? '/admin/dashboard' : '/dashboard';
   return (
     <header className="portal-header">
       <a className="portal-brand" href="/" aria-label="DAGITAB home">
@@ -180,14 +182,17 @@ function PortalHeader({ user, onLogout, path }) {
         <span>THE BUILDER COLLECTIVE</span>
       </a>
       <nav aria-label="Main navigation">
-        <a href="/">The initiative</a>
-        <a className={path.startsWith('/teams') ? 'active' : ''} href="/teams">
-          Explore teams
+        <a href="/app">App home</a>
+        <a
+          aria-current={path.startsWith('/teams') ? 'page' : undefined}
+          href="/teams"
+        >
+          Teams
         </a>
         {user && (
           <a
-            href="/dashboard"
-            className={path === '/dashboard' ? 'active' : ''}
+            href={workspacePath}
+            aria-current={path === workspacePath ? 'page' : undefined}
           >
             Workspace
           </a>
@@ -196,12 +201,9 @@ function PortalHeader({ user, onLogout, path }) {
       <div className="portal-account">
         {user ? (
           <>
-            <span className="p-badge purple">
-              {user.role === 'admin' ? 'Admin' : user.name.split(' ')[0]}
-            </span>
-            <button className="p-button secondary small" onClick={onLogout}>
-              <LogOut size={15} />
-              <span>Sign out</span>
+            <span className="portal-user-name">{user.name.split(' ')[0]}</span>
+            <button className="portal-sign-out" onClick={onLogout}>
+              <LogOut aria-hidden="true" size={15} /> Sign out
             </button>
           </>
         ) : (
@@ -364,25 +366,37 @@ function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
     const form = Object.fromEntries(new FormData(event.currentTarget));
     try {
       const session = await send(
-        registering ? '/register' : '/login',
+        registering ? '/register' : admin ? '/admin/login' : '/login',
         registering ? { ...form, teamId, expertise } : form,
       );
       setSession(session);
-      location.assign('/dashboard');
+      location.assign(
+        session.user.role === 'admin' ? '/admin/dashboard' : '/dashboard',
+      );
     } catch (err) {
       setError(err.message);
       setBusy(false);
     }
   }
-  if (user)
+  if (admin && user?.role === 'admin')
+    return <Redirect to="/admin/dashboard" />;
+  if (user && !admin)
     return (
       <main className="portal-main">
         <div className="portal-empty">
           <CheckCircle2 />
           <h1>You’re signed in.</h1>
-          <p>Your team workspace is ready to open.</p>
-          <a className="p-button primary" href="/dashboard">
-            Go to workspace <ArrowRight size={16} />
+          <p>
+            {user.role === 'admin'
+              ? 'Your admin console is ready to open.'
+              : 'Your team workspace is ready to open.'}
+          </p>
+          <a
+            className="p-button primary"
+            href={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'}
+          >
+            {user.role === 'admin' ? 'Open admin console' : 'Go to workspace'}{' '}
+            <ArrowRight size={16} />
           </a>
         </div>
       </main>
@@ -426,15 +440,20 @@ function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
           </div>
         </div>
       </aside>
-      <section className="auth-card" aria-labelledby="auth-title">
-        <div className="auth-tabs">
-          <a className={!registering ? 'active' : ''} href="/login">
-            Sign in
-          </a>
-          <a className={registering ? 'active' : ''} href="/register">
-            Create account
-          </a>
-        </div>
+      <section
+        className={registering ? 'auth-card registration-card' : 'auth-card'}
+        aria-labelledby="auth-title"
+      >
+        {!admin && (
+          <div className="auth-tabs">
+            <a className={!registering ? 'active' : ''} href="/login">
+              Sign in
+            </a>
+            <a className={registering ? 'active' : ''} href="/register">
+              Create account
+            </a>
+          </div>
+        )}
         <p className="portal-eyebrow">
           {admin
             ? 'EVENT ADMINISTRATION'
@@ -452,10 +471,12 @@ function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
         <p className="form-help">
           {registering
             ? 'Choose your team. Tell us what you bring.'
-            : 'Use your email or username and password to continue.'}
+            : admin
+              ? 'Use your administrator credentials to open the event console.'
+              : 'Use your email or username and password to continue.'}
         </p>
         {serviceError && (
-          <div className="form-message error" role="alert">
+          <div className="form-message error auth-service-alert" role="alert">
             <strong>Account service unavailable</strong>
             <p>
               You can view the form, but sign-in and registration are
@@ -631,7 +652,11 @@ function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
                 </>
               ) : (
                 <>
-                  {registering ? 'Create my account' : 'Sign in to workspace'}
+                  {registering
+                    ? 'Create my account'
+                    : admin
+                      ? 'Sign in to admin console'
+                      : 'Sign in to workspace'}
                   <ArrowRight size={17} />
                 </>
               )}
@@ -643,6 +668,10 @@ function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
             <>
               Already part of the collective? <a href="/login">Sign in</a>
             </>
+          ) : admin ? (
+            <a href={user ? '/dashboard' : '/login'}>
+              {user ? 'Return to your team workspace' : 'Member sign in'}
+            </a>
           ) : (
             <>
               New to DAGITAB? <a href="/register">Create an account</a>
@@ -892,27 +921,23 @@ function TeamSetting({ team, refresh }) {
   );
 }
 function Dashboard({ user }) {
+  const admin = user.role === 'admin';
   const [data, setData] = useState(null),
     [error, setError] = useState(''),
     [notice, setNotice] = useState(''),
-    [tab, setTab] = useState('tasks'),
+    [tab, setTab] = useState(admin ? 'settings' : 'tasks'),
     [filter, setFilter] = useState('all'),
     [editor, setEditor] = useState(null),
     [working, setWorking] = useState(null);
-  const admin = user?.role === 'admin';
   async function refresh() {
     const result = await api('/workspace');
     setData(result);
     setError('');
   }
   useEffect(() => {
-    document.title = 'Workspace · DAGITAB';
-    if (!user) {
-      location.replace('/login');
-      return;
-    }
+    document.title = admin ? 'Admin console · DAGITAB' : 'Workspace · DAGITAB';
     refresh().catch((err) => setError(err.message));
-  }, [user]);
+  }, [admin]);
   async function updateTask(task, change) {
     setWorking(task.id);
     setError('');
@@ -927,7 +952,6 @@ function Dashboard({ user }) {
       setWorking(null);
     }
   }
-  if (!user) return <Loading />;
   if (!data)
     return (
       <main className="portal-main">
@@ -1013,7 +1037,7 @@ function Dashboard({ user }) {
                   ? 'The work ahead.'
                   : tab === 'members'
                     ? 'Your people.'
-                    : 'Shape the collective.'}
+                    : 'Team settings'}
             </h1>
             <p>
               Welcome back, {user.name.split(' ')[0]}.{' '}
@@ -1392,6 +1416,22 @@ function ErrorState({ error, retry }) {
     </div>
   );
 }
+function Redirect({ to }) {
+  useEffect(() => {
+    location.replace(to);
+  }, [to]);
+  return <Loading />;
+}
+
+function WorkspaceRoute({ path, user }) {
+  if (path === '/admin/dashboard' && user?.role !== 'admin')
+    return <Redirect to="/admin/login" />;
+  if (!user) return <Redirect to="/login" />;
+  if (path === '/dashboard' && user.role === 'admin')
+    return <Redirect to="/admin/dashboard" />;
+  return <Dashboard user={user} />;
+}
+
 export default function Portal() {
   const [session, setSession] = useState(null),
     [teams, setTeams] = useState(
@@ -1430,11 +1470,12 @@ export default function Portal() {
   async function logout() {
     try {
       await send('/logout', {});
-      location.assign('/login');
+      location.assign(path.startsWith('/admin/') ? '/admin/login' : '/login');
     } catch (err) {
       setError(err.message);
     }
   }
+  const dashboard = path === '/dashboard' || path === '/admin/dashboard';
   const known =
     path === '/teams' ||
     path.startsWith('/teams/') ||
@@ -1446,7 +1487,7 @@ export default function Portal() {
         Skip to content
       </a>
       <PortalHeader user={session?.user} path={path} onLogout={logout} />
-      {error && path === '/dashboard' ? (
+      {error && dashboard ? (
         <main className="portal-main">
           <ErrorState error={error} retry={load} />
         </main>
@@ -1458,8 +1499,8 @@ export default function Portal() {
           selectedId={path.split('/')[2]}
           user={session.user}
         />
-      ) : path === '/dashboard' ? (
-        <Dashboard user={session.user} />
+      ) : dashboard ? (
+        <WorkspaceRoute path={path} user={session.user} />
       ) : known ? (
         <Auth
           mode={

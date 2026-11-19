@@ -22,7 +22,6 @@ import {
   MousePointer2,
 } from 'lucide-react';
 import LogoParticles from './LogoParticles';
-import GlassRefraction from './GlassRefraction';
 import Starfield from './Starfield';
 import { GlassBackdrop, ExperienceGraphic } from './GlassGraphics';
 import batstateuLogo from '../2.png';
@@ -46,6 +45,7 @@ const navigation = [
   ['Your impact', '#modules'],
   ['The roadmap', '#roadmap'],
   ['Teams', '/teams'],
+  ['App home', '/app'],
 ];
 const roleSkills = [
   ['System design', 'API design', 'Version control'],
@@ -1242,7 +1242,6 @@ export default function App() {
           </filter>
         </defs>
       </svg>
-      <GlassRefraction />
       <a className="skip-link" href="#main">
         Skip to content
       </a>

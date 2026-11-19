@@ -166,47 +166,18 @@
   border-color: #b59aff40;
   color: #ddd1f6;
 }
-/* Nearly opaque charcoal keeps the starfield quiet behind readable cards. */
+/* Solid supporting panels sit beside the refractive glass surfaces. */
 .public-site
   :is(
-    .hero-bottom,
-    .organization-card,
-    .module-card,
-    .system-diagram,
     .diagram-core,
-    .diagram-node,
     .bayanihan-note,
     .impact-strip,
     .experience-card,
-    .experience-art,
-    .roadmap-tabs,
-    .roadmap-list,
     .roadmap-note,
-    .faq-item,
-    .join-card,
-    .role-dialog,
-    .dialog-note
-  ),
-.public-site .hero-v2 .hero-bottom {
-  --liquid-fill: rgb(16 15 19 / 97%);
-  --liquid-edge: transparent;
+    .faq-item:not(.is-open)
+  ) {
   background: rgb(16 15 19 / 97%);
   border-color: transparent;
-  -webkit-backdrop-filter: blur(2px) saturate(1.05);
-  backdrop-filter: blur(2px) saturate(1.05);
-  box-shadow: none;
-}
-.public-site .organization-card:hover,
-.public-site .module-card:hover {
-  background: rgb(23 21 27 / 98%);
-  border-color: transparent;
-  box-shadow: none;
-}
-.public-site :is(.nav-wrap, .mobile-nav) {
-  background: rgb(12 11 15 / 97%);
-  border-color: rgb(255 255 255 / 8%);
-  -webkit-backdrop-filter: blur(2px) saturate(1.05);
-  backdrop-filter: blur(2px) saturate(1.05);
   box-shadow: none;
 }
 .public-site .experience-card {

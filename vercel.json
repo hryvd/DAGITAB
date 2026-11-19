@@ -35,6 +35,10 @@
   ],
   "rewrites": [
     {
+      "source": "/app/:path*",
+      "destination": "/index.html"
+    },
+    {
       "source": "/login",
       "destination": "/index.html"
     },
@@ -48,6 +52,10 @@
     },
     {
       "source": "/admin/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/dashboard",
       "destination": "/index.html"
     },
     {

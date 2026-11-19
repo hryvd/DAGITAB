@@ -91,6 +91,13 @@ test('accounts, CSRF, team permissions, delegation, persistence, and private sto
     assert.ok(!JSON.stringify(result.value).includes('password'));
     const aliceId = result.value.user.id;
     const oldCookie = alice.cookie;
+    result = await alice.request('/api/admin/login', {
+      method: 'POST',
+      body: account('alice@example.test'),
+    });
+    assert.equal(result.response.status, 403);
+    assert.equal(alice.cookie, oldCookie);
+    assert.equal((await alice.request('/api/session')).value.user.id, aliceId);
     for (const [client_, email, teamId] of [
       [bob, 'bob@example.test', 'frontend'],
       [outsider, 'other@example.test', 'backend'],
@@ -124,7 +131,7 @@ test('accounts, CSRF, team permissions, delegation, persistence, and private sto
       body: { email: 'admin@example.test', password: 'wrong password' },
     });
     assert.equal(result.response.status, 401);
-    result = await admin.request('/api/login', {
+    result = await admin.request('/api/admin/login', {
       method: 'POST',
       body: {
         email: 'admin@example.test',

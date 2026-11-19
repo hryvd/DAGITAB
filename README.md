@@ -24,11 +24,15 @@ npm run format:check
 
 The production frontend is generated in `dist/`. `npm run preview` only previews those static files; use `npm run dev` or the Node production server for working account and workspace APIs.
 
+## App home
+
+`/app` opens the builder hub. Its bottom navigation connects the home screen, team directory, program timeline, and signed-in workspace.
+
 ## Accounts and team workspaces
 
 Registration at `/register` stays inside DAGITAB. Developers choose Front-end, Back-end, Machine learning, Data, Research, or UI/UX & creative, select their expertise, and describe their intended contribution. `/teams` shows each team's focus and current registration availability. Administrators can close registration or set a capacity; no event capacity or real project is invented or seeded.
 
-Members sign in at `/login`; administrators can use `/admin/login`. Both use the same server-side authentication, with roles enforced by the API. `/dashboard` shows the signed-in member's team projects, tasks, and teammates. Team members can create tasks, delegate them to teammates, and update progress. Administrators create projects for teams, manage registration availability, and view the registration roster across teams.
+Members sign in at `/login` to open their team workspace at `/dashboard`. Administrators sign in at `/admin/login` to open team settings at `/admin/dashboard`. A signed-in participant can open the admin sign-in form and switch accounts with administrator credentials. Team members can create tasks, delegate them to teammates, and update progress. Administrators create projects for teams, manage registration availability, and view the registration roster across teams.
 
 There is no default administrator. Bootstrap one in a Bash terminal using an email that is not already registered:
 
@@ -56,7 +60,7 @@ Passwords are salted and hashed with scrypt. Sessions use expiring HttpOnly cook
 - `src/App.jsx` contains the public page structure and interactions. Work areas and suggested skills are illustrative; the city's priorities determine scope, while CURSOR confirms assignments and prerequisites.
 - `src/Portal.jsx` contains registration, sign-in, teams, and dashboards. `server/app.mjs` enforces authentication, validation, and team access; `server/teams.mjs` defines team descriptions.
 - `src/styles.css` and `src/redesign.css` define the base treatment and reveals. `src/orbit-theme.css` adds golden-orange accents and constellation details alongside purple, white, and black; `src/portal.css` styles account and workspace pages. `src/mobile.css` and `src/navigation.css` provide phone layouts and safe-area navigation.
-- `src/liquid-glass.css` resolves glass highlights and fills. `src/GlassRefraction.jsx` progressively adds rounded-edge lens maps on compatible desktop pointers; foreground text and logos remain undistorted.
+- `src/liquid-glass.css` sets glass highlights and fills. `src/GlassRefraction.jsx` bends the backdrop at rounded edges in browsers with SVG backdrop-filter support.
 - `src/Starfield.jsx` and `src/starfield.css` add a decorative sky. Stars slowly brighten and dim, use fewer points on phones, and stay static for reduced motion.
 - `src/GlassGraphics.jsx` provides original service-city, community, and system illustrations. `src/LogoParticles.jsx` forms the DAGITAB logo from spring-based particles, responds to pointers/taps, suspends rendering in hidden tabs, and respects reduced motion.
 - `public/brand/dagitab-logo.svg` is the authoritative user-uploaded event logo. Its transparent viewport is trimmed for consistent display; the embedded silver artwork and original transforms are preserved. It also supplies the particle formation mask.

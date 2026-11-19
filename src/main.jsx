@@ -8,6 +8,8 @@ import '@fontsource/dm-sans/latin-400.css';
 import '@fontsource/dm-sans/latin-500.css';
 import '@fontsource/dm-sans/latin-600.css';
 import App from './App.jsx';
+import AppHome from './AppHome.jsx';
+import GlassRefraction from './GlassRefraction.jsx';
 import Portal from './Portal.jsx';
 import './styles.css';
 import './redesign.css';
@@ -18,8 +20,14 @@ import './starfield.css';
 import './orbit-theme.css';
 import './portal.css';
 
+const { pathname } = window.location;
+let Page = Portal;
+if (pathname === '/') Page = App;
+if (pathname === '/app' || pathname.startsWith('/app/')) Page = AppHome;
+
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {window.location.pathname === '/' ? <App /> : <Portal />}
+    <GlassRefraction />
+    <Page />
   </React.StrictMode>,
 );

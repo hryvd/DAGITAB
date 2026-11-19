@@ -1,6 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 
 const panes = [
+  '[data-glass]',
+  '.registration-card',
   '.nav-wrap',
   '.mobile-nav',
   '.hero-bottom',
@@ -26,7 +28,7 @@ function edgeMap(width, height, radius) {
   canvas.height = Math.max(1, Math.round(height * resolution));
   const context = canvas.getContext('2d');
   const pixels = context.createImageData(canvas.width, canvas.height);
-  const band = Math.min(22, width / 4, height / 4);
+  const band = Math.min(12, width / 4, height / 4);
 
   for (let y = 0; y < canvas.height; y++) {
     for (let x = 0; x < canvas.width; x++) {
@@ -69,14 +71,11 @@ export default function GlassRefraction() {
 
   useEffect(() => {
     if (!CSS.supports('backdrop-filter', 'url("#glass")')) return;
-    // Touch browsers use native frosting; SVG backdrop URLs are not portable.
-    const desktop = window.matchMedia(
-      '(min-width: 901px) and (hover: hover) and (pointer: fine)',
-    );
-    const update = () => setEnabled(desktop.matches);
+    const reduced = window.matchMedia('(prefers-reduced-transparency: reduce)');
+    const update = () => setEnabled(!reduced.matches);
     update();
-    desktop.addEventListener('change', update);
-    return () => desktop.removeEventListener('change', update);
+    reduced.addEventListener('change', update);
+    return () => reduced.removeEventListener('change', update);
   }, []);
 
   useEffect(() => {
@@ -120,7 +119,7 @@ export default function GlassRefraction() {
       tracked.set(element, filter.id);
       element.style.setProperty(
         '--liquid-backdrop',
-        `url("#${filter.id}") blur(0.6px) saturate(1.15)`,
+        `url("#${filter.id}") var(--liquid-frost, blur(0.6px) saturate(1.15))`,
       );
     }
 

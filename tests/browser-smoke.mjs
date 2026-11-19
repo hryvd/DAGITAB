@@ -204,11 +204,35 @@ try {
     0,
   );
   const admin = await newPage();
-  await admin.goto(`${base}/admin/login`);
-  await admin.getByLabel('Username or email').fill('admin@example.test');
+  await admin.goto(`${base}/admin/dashboard`);
+  await admin.waitForURL('**/admin/login');
+  await admin.goto(`${base}/login`);
+  await admin.getByLabel('Username or email').fill('designer@example.test');
   await admin.locator('input[name="password"]').fill(password);
   await admin.getByRole('button', { name: 'Sign in to workspace' }).click();
   await admin.waitForURL('**/dashboard');
+  await admin.goto(`${base}/admin/dashboard`);
+  await admin.waitForURL('**/admin/login');
+  await admin.getByLabel('Username or email').fill('designer@example.test');
+  await admin.locator('input[name="password"]').fill(password);
+  await admin.getByRole('button', { name: 'Sign in to admin console' }).click();
+  await admin
+    .getByRole('alert')
+    .filter({ hasText: 'Administrator access required' })
+    .waitFor();
+  assert.equal(
+    (await (await admin.request.get(base + '/api/session')).json()).user.role,
+    'member',
+  );
+  await admin.getByLabel('Username or email').fill('admin@example.test');
+  await admin.locator('input[name="password"]').fill(password);
+  await admin.getByRole('button', { name: 'Sign in to admin console' }).click();
+  await admin.waitForURL('**/admin/dashboard');
+  await admin
+    .getByRole('heading', { name: 'Team settings', exact: true })
+    .waitFor();
+  await admin.goto(`${base}/dashboard`);
+  await admin.waitForURL('**/admin/dashboard');
   await admin.getByRole('button', { name: 'Projects', exact: true }).click();
   await admin.getByRole('button', { name: 'New project' }).click();
   const dialog = admin.getByRole('dialog');

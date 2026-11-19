@@ -86,29 +86,48 @@
   gap: 8px;
   margin-left: auto;
 }
-.portal-header nav a {
-  padding: 12px 16px;
+.portal-header nav a,
+.portal .portal-sign-out {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
   min-height: 44px;
+  line-height: 1.4;
   font-size: 13px;
+  font-weight: 500;
   color: #bcb8c4;
-  border-radius: 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
 }
-.portal-header nav a:hover {
+.portal-header nav a:hover,
+.portal-sign-out:hover {
   background: #ffffff08;
   color: #fff;
 }
-.portal-header nav a.active {
+.portal-header nav a[aria-current] {
   color: var(--p-gold-bright);
-  background: #ffb4520d;
+  background: linear-gradient(var(--p-gold), var(--p-gold)) center
+    calc(100% - 4px) / 20px 2px no-repeat;
 }
 .portal-account {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-.portal-account > span {
-  font-size: 12px;
-  color: var(--p-muted);
+.portal-user-name {
+  border-inline-start: 1px solid var(--p-line);
+  padding-inline-start: 18px;
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  color: #e3dce9;
 }
 .portal-main {
   width: min(1260px, calc(100% - 64px));
@@ -1128,6 +1147,57 @@
   -webkit-backdrop-filter: blur(2px) saturate(1.05);
   backdrop-filter: blur(2px) saturate(1.05);
 }
+#root .portal .registration-card {
+  background: linear-gradient(
+    145deg,
+    rgb(25 19 30 / 95%),
+    rgb(13 11 16 / 95%) 75%
+  );
+  --liquid-frost: blur(5px);
+  --liquid-backdrop: var(--liquid-frost);
+  background-clip: padding-box;
+  border-color: rgb(225 204 255 / 22%);
+  box-shadow: var(--liquid-shadow);
+  -webkit-backdrop-filter: var(--liquid-backdrop);
+  backdrop-filter: var(--liquid-backdrop);
+}
+.portal .registration-card .auth-service-alert {
+  margin-bottom: 24px;
+}
+.portal .registration-card :is(.form-help, .expertise-fieldset legend span) {
+  color: #ded2ea;
+}
+.portal
+  .registration-card
+  :is(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--p-gold-bright);
+  outline-offset: 3px;
+}
+.portal .registration-card .expertise-options label:has(input:focus-visible) {
+  border-color: var(--p-gold-bright);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .portal .registration-card::before {
+    transform-origin: left;
+    animation: registration-highlight 360ms ease-out both;
+  }
+  .portal .registration-card .expertise-options label {
+    transition:
+      background-color 160ms,
+      border-color 160ms,
+      color 160ms;
+  }
+}
+@keyframes registration-highlight {
+  from {
+    opacity: 0;
+    transform: scaleX(0.25);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
 @media (prefers-reduced-transparency: reduce) {
   #root
     .portal
@@ -1658,8 +1728,10 @@
   .portal-account {
     gap: 8px;
   }
-  .portal-account > span {
-    display: none;
+  .portal-user-name {
+    max-width: 9ch;
+    padding: 0;
+    border: 0;
   }
   .portal-account > .portal-login-link {
     font-size: 10px;
@@ -1677,9 +1749,13 @@
   .portal-header nav {
     gap: 0;
   }
+  .portal-user-name,
+  .portal .portal-sign-out,
+  .portal-header nav a {
+    font-size: 12px;
+  }
   .portal-header nav a {
     padding: 10px 7px;
-    font-size: 11px;
   }
   .portal-main {
     width: calc(100% - 32px);

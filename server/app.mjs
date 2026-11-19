@@ -254,6 +254,7 @@ const contentTypes = {
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.webp': 'image/webp',
   '.ico': 'image/x-icon',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
@@ -588,7 +589,10 @@ export function createApp({
             csrfToken: current.csrf,
           });
         }
-        if (req.method === 'POST' && path === '/api/login') {
+        if (
+          req.method === 'POST' &&
+          (path === '/api/login' || path === '/api/admin/login')
+        ) {
           await rateLimit(req, 'login', 30, 15 * 60_000);
           const body = await readJson(req);
           const identifier = text(
@@ -616,6 +620,7 @@ export function createApp({
               401,
               'Email, username, or password is incorrect.',
             );
+          if (path === '/api/admin/login') requireAdmin(user);
           current = await newSession(res, user.id, current.tokenHash);
           return send(res, 200, {
             user: publicUser(user),

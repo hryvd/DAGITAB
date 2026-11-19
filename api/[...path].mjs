@@ -2,7 +2,7 @@ import { createApp } from '../server/app.mjs';
 import { openPostgres } from '../server/postgres.mjs';
 const METHODS = [
   ['GET', /^\/api\/(?:session|teams|workspace)$/],
-  ['POST', /^\/api\/(?:register|login|logout|projects|tasks)$/],
+  ['POST', /^\/api\/(?:register|login|admin\/login|logout|projects|tasks)$/],
   ['PATCH', /^\/api\/(?:projects|tasks)\/\d+$/],
   ['PATCH', /^\/api\/teams\/(?:frontend|backend|ml|data|research|design)$/],
 ];
