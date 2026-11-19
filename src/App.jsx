@@ -97,7 +97,14 @@ function SectionLabel({ number, children }) {
   );
 }
 
-function Header() {
+function Header({ appView }) {
+  const links = appView
+    ? [
+        ['The initiative', '/'],
+        ['The roadmap', '/app/program'],
+        ['Teams', '/app/teams'],
+      ]
+    : navigation;
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef(null);
   const mobileNavRef = useRef(null);
@@ -196,7 +203,7 @@ function Header() {
       <div className="nav-wrap container">
         <a
           className="brand"
-          href="#top"
+          href={appView ? '/app' : '#top'}
           aria-label="DAGITAB home"
           onClick={() => {
             setMenuOpen(false);
@@ -213,7 +220,7 @@ function Header() {
           <span className="brand-sub">A CURSOR INITIATIVE</span>
         </a>
         <nav className="desktop-nav" aria-label="Main navigation">
-          {navigation.map(([label, href]) => (
+          {links.map(([label, href]) => (
             <a
               key={href}
               href={href}
@@ -251,7 +258,7 @@ function Header() {
           id={menuId}
           aria-label="Mobile navigation"
         >
-          {navigation.map(([label, href]) => (
+          {links.map(([label, href]) => (
             <a
               key={href}
               href={href}
@@ -302,7 +309,7 @@ function SignalTicker() {
   );
 }
 
-function Hero() {
+function Hero({ appView }) {
   return (
     <>
       <section className="hero hero-v2" aria-labelledby="hero-title">
@@ -372,8 +379,14 @@ function Hero() {
               Batangas City—with a community that moves forward together.
             </p>
             <div className="hero-buttons">
-              <JoinLink />
-              <a className="text-link" href="/teams">
+              {appView ? (
+                <a className="button button-lime" href="/app/workspace">
+                  Open workspace <ArrowUpRight size={19} />
+                </a>
+              ) : (
+                <JoinLink />
+              )}
+              <a className="text-link" href={appView ? '/app/teams' : '/teams'}>
                 Find your team
                 <ArrowUpRight size={17} />
               </a>
@@ -400,7 +413,7 @@ function Hero() {
                 FOR BATANGAS CITY
               </span>
             </div>
-            <a className="scroll-cue" href="#about">
+            <a className="scroll-cue" href={appView ? '/#about' : '#about'}>
               EXPLORE THE COLLECTIVE
               <ArrowDown size={14} />
             </a>
@@ -1223,7 +1236,7 @@ function usePageMotion() {
   }, []);
 }
 
-export default function App() {
+export default function App({ appView }) {
   usePageMotion();
   return (
     <div className="public-site">
@@ -1246,18 +1259,29 @@ export default function App() {
         Skip to content
       </a>
       <div id="top" />
-      <Header />
+      <Header appView={appView} />
       <main id="main">
-        <Hero />
-        <Organizations />
-        <About />
-        <Modules />
-        <Experience />
-        <Roadmap />
-        <Faq />
-        <Join />
+        {appView === 'program' ? (
+          <>
+            <h1 className="sr-only">Program timeline</h1>
+            <Roadmap />
+          </>
+        ) : (
+          <Hero appView={appView} />
+        )}
+        {!appView && (
+          <>
+            <Organizations />
+            <About />
+            <Modules />
+            <Experience />
+            <Roadmap />
+            <Faq />
+            <Join />
+          </>
+        )}
       </main>
-      <Footer />
+      {!appView && <Footer />}
     </div>
   );
 }

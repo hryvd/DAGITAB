@@ -220,7 +220,7 @@ function PortalHeader({ user, onLogout, path }) {
     </header>
   );
 }
-function Teams({ teams, selectedId, user }) {
+function Teams({ teams, selectedId, user, directory = '/teams' }) {
   const selected = teams.find((team) => team.id === selectedId);
   return (
     <main id="main" className="portal-main">
@@ -256,7 +256,7 @@ function Teams({ teams, selectedId, user }) {
       </div>
       {selected && (
         <section className="team-detail" aria-labelledby="team-detail-title">
-          <a className="p-button secondary small" href="/teams">
+          <a className="p-button secondary small" href={directory}>
             <ArrowLeft size={15} /> All teams
           </a>
           <div className="portal-heading">
@@ -317,7 +317,7 @@ function Teams({ teams, selectedId, user }) {
                     : `${team.memberCount} ${team.memberCount === 1 ? 'builder' : 'builders'} joined`}
                 </span>
                 <a
-                  href={`/teams/${team.id}`}
+                  href={`${directory}/${team.id}`}
                   aria-label={`Explore ${team.name}`}
                 >
                   Explore team <ArrowUpRight size={17} />
@@ -1432,7 +1432,7 @@ function WorkspaceRoute({ path, user }) {
   return <Dashboard user={user} />;
 }
 
-export default function Portal() {
+export default function Portal({ pagePath }) {
   const [session, setSession] = useState(null),
     [teams, setTeams] = useState(
       teamCatalog.map((team) => ({
@@ -1445,7 +1445,7 @@ export default function Portal() {
     ),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(true);
-  const rawPath = location.pathname.replace(/\/$/, '') || '/';
+  const rawPath = (pagePath || location.pathname).replace(/\/$/, '') || '/';
   const path = rawPath === '/signup' ? '/register' : rawPath;
   async function load() {
     try {
@@ -1496,6 +1496,7 @@ export default function Portal() {
       ) : path.startsWith('/teams') ? (
         <Teams
           teams={teams}
+          directory={pagePath ? '/app/teams' : '/teams'}
           selectedId={path.split('/')[2]}
           user={session.user}
         />

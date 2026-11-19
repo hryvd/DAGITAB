@@ -110,6 +110,41 @@ try {
   await publicPage.goto(base);
 
   assert.equal(await publicPage.locator('a[href*="notion"]').count(), 0);
+  for (const width of [1440, 390, 320]) {
+    await publicPage.setViewportSize({ width, height: 844 });
+    await publicPage.goto(base + '/app');
+    const dock = publicPage.getByRole('navigation', { name: 'App navigation' });
+    await publicPage.locator('.hero-v2 .logo-particle-canvas').waitFor();
+    assert.ok(
+      await publicPage.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      'app home fits its viewport',
+    );
+    await dock.getByRole('link', { name: 'Program' }).click();
+    const phases = publicPage.getByRole('tablist', { name: 'Program phases' });
+    await phases.getByRole('tab').last().click();
+    await publicPage
+      .getByRole('heading', { name: 'Deployment & turnover' })
+      .waitFor();
+    await dock.getByRole('link', { name: 'Teams' }).click();
+    await publicPage.locator('.team-card').first().waitFor();
+    assert.equal(await publicPage.locator('.team-card').count(), 6);
+    await publicPage
+      .getByRole('link', { name: 'Explore Front-end engineering' })
+      .click();
+    await publicPage.waitForURL('**/app/teams/frontend');
+    await publicPage.reload();
+    await publicPage.locator('.team-detail').waitFor();
+    assert.equal(
+      await dock.locator('[aria-current=page]').innerText(),
+      'Teams',
+    );
+    await dock.getByRole('link', { name: 'Workspace' }).click();
+    await publicPage.waitForURL('**/login');
+  }
+  await publicPage.setViewportSize({ width: 1440, height: 1000 });
+  await publicPage.goto(base);
   await publicPage.getByRole('link', { name: 'Teams', exact: true }).click();
   await publicPage
     .getByRole('heading', { name: 'Find your constellation.' })
