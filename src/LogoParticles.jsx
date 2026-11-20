@@ -18,14 +18,17 @@ export default function LogoParticles({
   const stageRef = useRef(null);
   const canvasRef = useRef(null);
   const onReadyRef = useRef(onReady);
-  const [showFallback, setShowFallback] = useState(true);
+  const [showFallback, setShowFallback] = useState(false);
   onReadyRef.current = onReady;
 
   useEffect(() => {
     const stage = stageRef.current;
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d', { alpha: true });
-    if (!context) return undefined;
+    if (!context) {
+      setShowFallback(true);
+      return;
+    }
 
     let disposed = false;
     let ready = false;
@@ -35,7 +38,8 @@ export default function LogoParticles({
     let lastTimestamp = 0;
     let elapsed = 0;
     let burstAge = 99;
-    let scatterLevel = 0;
+    let formed = false;
+    let revealProgress = 0;
     let width = 1;
     let height = 1;
     let ratio = 1;
@@ -47,6 +51,7 @@ export default function LogoParticles({
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const pointer = { x: -1000, y: -1000, active: false, downX: 0, downY: 0 };
     const image = new Image();
+    const artwork = document.createElement('canvas');
 
     function seededRandom(seed) {
       return () => {
@@ -87,7 +92,7 @@ export default function LogoParticles({
 
     function makeParticles() {
       const random = seededRandom(56419);
-      const count = Math.min(targets.length, width < 600 ? 2800 : 5800);
+      const count = Math.min(targets.length, width < 600 ? 4200 : 8600);
       groups.forEach((group) => {
         group.length = 0;
       });
@@ -117,6 +122,21 @@ export default function LogoParticles({
       const aspect = image.naturalWidth / image.naturalHeight;
       logoWidth = Math.min(width * 0.94, height * 0.82 * aspect);
       logoHeight = logoWidth / aspect;
+
+      // Rasterize the silver artwork and its halo once per size.
+      artwork.width = canvas.width;
+      artwork.height = canvas.height;
+      const layer = artwork.getContext('2d');
+      layer.scale(ratio, ratio);
+      layer.shadowColor = 'rgba(194, 166, 255, 0.46)';
+      layer.shadowBlur = (width < 600 ? 7 : 12) * ratio;
+      layer.drawImage(
+        image,
+        (width - logoWidth) / 2,
+        (height - logoHeight) / 2,
+        logoWidth,
+        logoHeight,
+      );
     }
 
     function update(delta) {
@@ -132,30 +152,18 @@ export default function LogoParticles({
       const clickBurst =
         burstAge < 1.8 ? Math.sin((burstAge / 1.8) * Math.PI) * 0.88 : 0;
       const scatter = Math.max(clickBurst, cycleBurst);
-      scatterLevel = scatter;
+      if (scatter > 0) formed = false;
+      let settled = !scatter;
+      const damping = Math.pow(0.76, dt);
+      const spring = elapsed < 1.8 ? 0.045 : 0.055;
       const radius = width < 600 ? 48 : 100;
       const radiusSquared = radius * radius;
 
-      canvas.dataset.animationState =
-        scatter > 0.02 ? 'scattering' : elapsed < 1.9 ? 'assembling' : 'formed';
-      for (let i = 0; i < particles.length; i += 1) {
-        const particle = particles[i];
-        const phase = elapsed * 1.3 + particle.seed;
+      for (const particle of particles) {
         const baseX = width * 0.5 + particle.target.x * logoWidth;
         const baseY = height * 0.5 + particle.target.y * logoHeight;
-        // A travelling glint lifts small groups while the logo remains legible.
-        const wave =
-          Math.sin(phase + particle.target.x * 13) *
-          (2.1 + Math.sin(elapsed * 0.7 + particle.seed) * 0.8);
-        const crest = Math.pow(
-          (Math.sin(elapsed * 1.7 + particle.target.x * 6.8) + 1) * 0.5,
-          8,
-        );
-        let targetX =
-          baseX +
-          Math.cos(phase * 0.73) * 1.5 +
-          crest * Math.cos(particle.seed) * 4;
-        let targetY = baseY + wave + crest * Math.sin(particle.seed) * 6;
+        let targetX = baseX;
+        let targetY = baseY;
         if (scatter > 0) {
           const orbitAngle = particle.angle + elapsed * 0.42;
           const orbitX =
@@ -180,7 +188,7 @@ export default function LogoParticles({
               0.42 *
               particle.orbit;
         }
-        if (pointer.active) {
+        if (pointer.active && revealProgress === 1) {
           const px = particle.x - pointer.x;
           const py = particle.y - pointer.y;
           const squared = px * px + py * py;
@@ -191,16 +199,34 @@ export default function LogoParticles({
             particle.vy += (py / distance) * strength * dt;
           }
         }
-        const spring = elapsed < 1.8 ? 0.045 : 0.055;
         particle.vx =
-          (particle.vx + (targetX - particle.x) * spring * dt) *
-          Math.pow(0.76, dt);
+          (particle.vx + (targetX - particle.x) * spring * dt) * damping;
         particle.vy =
-          (particle.vy + (targetY - particle.y) * spring * dt) *
-          Math.pow(0.76, dt);
+          (particle.vy + (targetY - particle.y) * spring * dt) * damping;
         particle.x += particle.vx * dt;
         particle.y += particle.vy * dt;
+
+        if (!formed && settled) {
+          settled =
+            elapsed >= particle.delay &&
+            Math.abs(particle.x - baseX) < 0.65 &&
+            Math.abs(particle.y - baseY) < 0.65 &&
+            Math.abs(particle.vx) < 0.16 &&
+            Math.abs(particle.vy) < 0.16;
+        }
       }
+
+      if (settled) formed = true;
+      if (formed) revealProgress = Math.min(1, revealProgress + delta / 1.1);
+      else revealProgress = Math.max(0, revealProgress - delta / 0.38);
+      canvas.dataset.animationState =
+        scatter > 0
+          ? 'scattering'
+          : !formed
+            ? 'assembling'
+            : revealProgress < 1
+              ? 'revealing'
+              : 'formed';
     }
 
     function paint() {
@@ -219,17 +245,13 @@ export default function LogoParticles({
         canvas.dataset.animationState = 'reduced';
       } else {
         context.globalCompositeOperation = 'lighter';
-        // Reveal the supplied silver artwork intact as its particles assemble.
-        const underlay = Math.max(0, Math.min(1, (elapsed - 0.65) / 1.4));
-        context.globalAlpha = underlay * (1 - scatterLevel);
-        context.drawImage(
-          image,
-          (width - logoWidth) / 2,
-          (height - logoHeight) / 2,
-          logoWidth,
-          logoHeight,
-        );
-        if (pointer.active) {
+        const underlay =
+          revealProgress * revealProgress * (3 - 2 * revealProgress);
+        if (underlay > 0) {
+          context.globalAlpha = underlay;
+          context.drawImage(artwork, 0, 0, width, height);
+        }
+        if (pointer.active && revealProgress === 1) {
           const radius = width < 600 ? 43 : 82;
           const opening = context.createRadialGradient(
             pointer.x,
@@ -254,7 +276,9 @@ export default function LogoParticles({
         }
         const particleVisibility = Math.min(
           1,
-          1 - underlay * 0.86 + scatterLevel + (pointer.active ? 0.2 : 0),
+          1 -
+            underlay * 0.9 +
+            (pointer.active && revealProgress === 1 ? 0.2 : 0),
         );
         for (let color = 0; color < groups.length; color += 1) {
           context.fillStyle = COLORS[color];
@@ -328,12 +352,15 @@ export default function LogoParticles({
         fitLogo();
         makeParticles();
         elapsed = 0;
+        formed = false;
+        revealProgress = 0;
+        burstAge = 99;
         sync();
       }
     }
 
     function move(event) {
-      if (motion.matches) return;
+      if (motion.matches || revealProgress < 1) return;
       const bounds = stage.getBoundingClientRect();
       pointer.x = event.clientX - bounds.left;
       pointer.y = event.clientY - bounds.top;
@@ -342,6 +369,7 @@ export default function LogoParticles({
 
     function scatter() {
       if (motion.matches || !ready) return;
+      formed = false;
       burstAge = 0;
       pointer.active = false;
       for (const particle of particles) {
@@ -396,7 +424,10 @@ export default function LogoParticles({
       if (disposed) return;
       try {
         sampleLogo();
-        if (!targets.length) return;
+        if (!targets.length) {
+          setShowFallback(true);
+          return;
+        }
         ready = true;
         fitLogo();
         makeParticles();
@@ -406,10 +437,12 @@ export default function LogoParticles({
         onReadyRef.current?.();
       } catch {
         // The original image remains visible if a browser cannot read the mask.
+        setShowFallback(true);
         canvas.dataset.ready = 'fallback';
       }
     };
     image.onerror = () => {
+      setShowFallback(true);
       canvas.dataset.ready = 'fallback';
     };
     resize();

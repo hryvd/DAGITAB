@@ -16,7 +16,7 @@
   grid-template-columns: repeat(4, 1fr);
   padding: 5px 8px;
   width: min(400px, calc(100% - 24px));
-  background: rgb(12 11 15 / 72%);
+  background: rgb(0 0 0 / 72%);
   box-shadow: var(--liquid-shadow);
 }
 .hub-dock a {

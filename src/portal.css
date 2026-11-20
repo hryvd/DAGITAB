@@ -95,7 +95,7 @@
 }
 .portal-header nav a:hover,
 .portal-sign-out:hover {
-  background: #ffffff08;
+  background: #00000008;
   color: #fff;
 }
 .portal-header nav a[aria-current] {
@@ -202,7 +202,7 @@
   border: 1px solid #ffffff25;
   border-radius: 9px;
   padding: 12px 19px;
-  background: #ffffff06;
+  background: #00000006;
   color: #f5f3f8;
   font-size: 13px;
   font-weight: 600;
@@ -212,22 +212,22 @@
   text-decoration: none;
 }
 .portal .p-button:hover {
-  background: #ffffff0e;
+  background: #0000000e;
   border-color: #ffffff50;
 }
 .portal .p-button.primary {
-  background: #ffbd65;
+  background: #000;
   border-color: #ffc775;
-  color: #261707;
+  color: var(--p-gold-bright);
 }
 .portal .p-button.primary:hover {
-  background: #ffd394;
+  background: #000;
   border-color: #ffe1b4;
   transform: translateY(-1px);
 }
 .portal .p-button.secondary {
   color: #e4dafc;
-  background: #ba9dff09;
+  background: #00000009;
   border-color: #ba9dff35;
 }
 .portal .p-button.small {
@@ -238,7 +238,7 @@
 .portal .p-button.danger {
   color: #ffbbaf;
   border-color: #f39a8635;
-  background: #f39a860b;
+  background: #0000000b;
 }
 .portal .p-badge {
   display: inline-flex;
@@ -246,7 +246,7 @@
   gap: 6px;
   white-space: nowrap;
   border: 1px solid #ffffff20;
-  background: #ffffff06;
+  background: #00000006;
   color: #d8d5df;
   border-radius: 20px;
   padding: 5px 10px;
@@ -258,16 +258,16 @@
 .portal .p-badge.gold {
   color: #ffd191;
   border-color: #ffb45230;
-  background: #ffb4520b;
+  background: #0000000b;
 }
 .portal .p-badge.purple {
   color: #cfb9ff;
   border-color: #ba9dff30;
-  background: #ba9dff0d;
+  background: #0000000d;
 }
 .portal .p-badge.muted {
   color: #b0acba;
-  background: #ffffff03;
+  background: #00000003;
 }
 .portal-grid {
   display: grid;
@@ -304,12 +304,12 @@
   height: 46px;
   border-radius: 12px;
   color: var(--p-gold);
-  background: #ffb4520a;
+  background: #0000000a;
   border: 1px solid #ffb45224;
 }
 .team-card:nth-child(even) .team-icon {
   color: var(--p-purple);
-  background: #ba9dff0a;
+  background: #0000000a;
   border-color: #ba9dff24;
 }
 .team-number {
@@ -340,7 +340,7 @@
 }
 .team-focus li {
   border: 1px solid #ffffff13;
-  background: #ffffff03;
+  background: #00000003;
   padding: 5px 9px;
   border-radius: 5px;
   color: #c2bccb;
@@ -495,7 +495,7 @@
   border: 1px solid #ffffff24;
   border-radius: 8px;
   color: #f1edf8;
-  background: #131117;
+  background: #000;
   font-size: 13px;
   line-height: 1.5;
   accent-color: #b47b2e;
@@ -510,7 +510,7 @@
 }
 .portal .auth-card :is(.p-input, .p-select, .p-textarea) {
   color: #f3edf8;
-  background: #09080c;
+  background: #000;
   border-color: #c1a5da35;
 }
 .portal .auth-card :is(input, select, textarea):focus-visible {
@@ -520,7 +520,6 @@
 .portal .auth-card .p-button.primary {
   width: 100%;
   margin-top: 2px;
-  color: #271c10;
   border-color: #e8ad56;
 }
 .portal .auth-card fieldset {
@@ -548,11 +547,11 @@
   min-height: 42px;
   font-size: 11px;
   cursor: pointer;
-  background: #ffffff03;
+  background: #00000003;
 }
 .portal .expertise-options label:has(input:checked) {
   color: #ffcf92;
-  background: #ffb45212;
+  background: #00000012;
   border-color: #ffb45280;
 }
 .portal .expertise-options input {
@@ -578,22 +577,22 @@
 }
 .portal .form-message.error {
   color: #ffb7ac;
-  background: #bb3d2512;
+  background: #00000012;
   border-color: #f18b7240;
 }
 .portal .form-message.success {
   color: #b6e1c3;
-  background: #55a37113;
+  background: #00000013;
   border-color: #80c29835;
 }
 .portal .auth-card .form-message.error {
   color: #ffc0b2;
-  background: #d55a2e12;
+  background: #00000012;
   border-color: #e28c694f;
 }
 .portal .auth-card .form-message.success {
   color: #b8e8cb;
-  background: #5cb57c12;
+  background: #00000012;
   border-color: #8cd7ad45;
 }
 .auth-footer {
@@ -684,12 +683,12 @@
   padding: 12px;
 }
 .workspace-nav button:hover {
-  background: #ffffff05;
+  background: #00000005;
   color: #eee7fa;
 }
 .workspace-nav button.active {
   color: #ffd295;
-  background: #ffb4520b;
+  background: #0000000b;
   border-color: #ffb45222;
 }
 .workspace-sidebar .auth-note {
@@ -816,7 +815,7 @@
   min-width: 0;
   border-radius: 12px;
   border: 1px solid #ffffff0e;
-  background: #ffffff02;
+  background: #00000002;
   padding: 12px;
   min-height: 320px;
 }
@@ -835,7 +834,7 @@
 }
 .task-column-title > span {
   font-size: 10px;
-  background: #ffffff0c;
+  background: #0000000c;
   border-radius: 4px;
   padding: 2px 6px;
   color: #afa5be;
@@ -892,7 +891,7 @@
   min-height: 40px;
   padding: 8px;
   border: 1px solid #ffffff20;
-  background: #211927;
+  background: #000;
   color: #eee7f7;
   border-radius: 5px;
 }
@@ -1002,7 +1001,7 @@
   padding: 28px;
 }
 .portal .p-dialog::backdrop {
-  background: #040206b3;
+  background: #000000b3;
   backdrop-filter: blur(7px);
 }
 .dialog-heading {
@@ -1023,19 +1022,19 @@
   width: 44px;
   height: 44px;
   border: 1px solid #ffffff20;
-  background: #ffffff04;
+  background: #00000004;
   color: #c7bbd2;
   border-radius: 8px;
   flex-shrink: 0;
 }
 .portal .dialog-close:hover {
-  background: #ffffff0e;
+  background: #0000000e;
   color: #fff;
 }
 .portal-alert {
   border: 1px solid #ba9dff38;
   border-radius: 10px;
-  background: #ba9dff0b;
+  background: #0000000b;
   padding: 14px 18px;
   color: #d1c3e5;
   font-size: 12px;
@@ -1051,7 +1050,7 @@
   border-radius: 10px;
   padding: 14px 20px;
   color: #ffe1b2;
-  background: #21170ff5;
+  background: #000000f5;
   box-shadow: 0 8px 40px #0008;
   max-width: calc(100% - 48px);
   font-size: 12px;
@@ -1064,7 +1063,7 @@
   margin: 26px 0;
 }
 #root .portal [data-glass] {
-  background: var(--portal-pane-fill, rgb(18 15 22 / 62%));
+  background: var(--portal-pane-fill, rgb(0 0 0 / 62%));
   background-clip: padding-box;
   border-color: var(--p-line);
   box-shadow: none;
@@ -1072,12 +1071,12 @@
   backdrop-filter: var(--liquid-backdrop);
 }
 .portal .registration-card {
-  --portal-pane-fill: rgb(18 15 22 / 95%);
+  --portal-pane-fill: rgb(0 0 0 / 95%);
   --liquid-frost: blur(5px);
   --liquid-backdrop: var(--liquid-frost);
 }
 .portal .p-dialog {
-  --portal-pane-fill: rgb(18 15 22 / 90%);
+  --portal-pane-fill: rgb(0 0 0 / 90%);
 }
 .portal .registration-card .auth-service-alert {
   margin-bottom: 24px;
@@ -1104,7 +1103,7 @@
 }
 @media (prefers-reduced-transparency: reduce) {
   #root .portal [data-glass] {
-    background: #131016;
+    background: #000;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -1151,7 +1150,7 @@
   border: 1px solid #ffffff24;
   border-radius: 8px;
   color: #f1edf8;
-  background: #131117;
+  background: #000;
   font-size: 13px;
   line-height: 1.5;
   box-shadow: none;
@@ -1164,7 +1163,7 @@
 }
 .portal .auth-card .p-field :is(input, select, textarea) {
   color: #f3edf8;
-  background: #09080c;
+  background: #000;
   border-color: #c1a5da35;
 }
 .portal .auth-card .p-field :is(input, textarea)::placeholder {
@@ -1301,14 +1300,14 @@
   display: grid;
   place-items: center;
   border: 1px solid #ba9dff2b;
-  background: #ba9dff08;
+  background: #00000008;
   border-radius: 15px;
   color: #d6bcff;
 }
 .workspace-nav button > span {
   margin-left: auto;
   padding: 1px 6px;
-  background: #ffb45213;
+  background: #00000013;
   border-radius: 4px;
   font-size: 10px;
 }
@@ -1396,10 +1395,10 @@
   border: 0;
   border-radius: 4px;
   overflow: hidden;
-  background: #ffffff14;
+  background: #00000014;
 }
 .project-progress progress::-webkit-progress-bar {
-  background: #ffffff14;
+  background: #00000014;
   border-radius: 4px;
 }
 .project-progress progress::-webkit-progress-value {

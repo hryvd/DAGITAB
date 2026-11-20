@@ -1,7 +1,7 @@
 /* Clear surfaces keep the black canvas visible while bending the artwork below. */
 :root {
   --liquid-backdrop: blur(2px);
-  --liquid-fill: rgb(13 12 16 / 54%);
+  --liquid-fill: rgb(0 0 0 / 54%);
   --liquid-edge: rgb(218 211 230 / 12%);
   --liquid-shadow: 0 9px 24px rgb(0 0 0 / 22%);
 }
@@ -36,11 +36,11 @@
 
 .nav-wrap,
 .mobile-nav {
-  --liquid-fill: rgb(8 9 12 / 62%);
+  --liquid-fill: rgb(0 0 0 / 62%);
 }
 
 .hero-bottom {
-  --liquid-fill: rgb(5 6 8 / 46%);
+  --liquid-fill: rgb(0 0 0 / 46%);
   border-radius: 20px;
 }
 
@@ -78,7 +78,7 @@
   min-height: 0;
   padding: 24px 22px;
   text-align: center;
-  --liquid-fill: rgb(4 5 7 / 44%);
+  --liquid-fill: rgb(0 0 0 / 44%);
   transition:
     border-color 240ms ease,
     box-shadow 240ms ease,
@@ -195,16 +195,16 @@
 .module-card:first-of-type,
 .module-card:nth-of-type(3n + 2),
 .module-card:hover {
-  --liquid-fill: rgb(4 5 7 / 48%);
+  --liquid-fill: rgb(0 0 0 / 48%);
   background: var(--liquid-fill);
 }
 
 .system-diagram {
-  --liquid-fill: rgb(5 7 10 / 48%);
+  --liquid-fill: rgb(0 0 0 / 48%);
 }
 
 .diagram-node {
-  --liquid-fill: rgb(14 17 22 / 58%);
+  --liquid-fill: rgb(0 0 0 / 58%);
   border-radius: 13px;
 }
 
@@ -212,7 +212,7 @@
   position: relative;
   display: grid;
   place-items: center;
-  --liquid-fill: rgb(4 6 9 / 50%);
+  --liquid-fill: rgb(0 0 0 / 50%);
 }
 
 .experience-art::after {
@@ -230,7 +230,7 @@
 .roadmap-list,
 .faq-item.is-open,
 .dialog-note {
-  --liquid-fill: rgb(6 7 10 / 56%);
+  --liquid-fill: rgb(0 0 0 / 56%);
 }
 
 .roadmap-tabs button {
@@ -238,11 +238,11 @@
 }
 
 .join-card {
-  --liquid-fill: rgb(5 6 8 / 48%);
+  --liquid-fill: rgb(0 0 0 / 48%);
 }
 
 .role-dialog {
-  --liquid-fill: rgb(7 9 12 / 65%);
+  --liquid-fill: rgb(0 0 0 / 65%);
 }
 
 .role-dialog::backdrop {
@@ -258,7 +258,7 @@
 
 .button-outline,
 .icon-button {
-  background: rgb(12 10 16 / 56%);
+  background: rgb(0 0 0 / 56%);
   border-color: var(--liquid-edge);
   box-shadow: none;
 }
@@ -329,16 +329,16 @@
     .join-card,
     .dialog-note
   ) {
-    --liquid-fill: rgb(12 10 20 / 32%);
+    --liquid-fill: rgb(0 0 0 / 32%);
   }
 
   .nav-wrap {
-    --liquid-fill: rgb(12 10 20 / 62%);
+    --liquid-fill: rgb(0 0 0 / 62%);
   }
 
   .mobile-nav,
   .role-dialog {
-    --liquid-fill: rgb(12 10 20 / 78%);
+    --liquid-fill: rgb(0 0 0 / 78%);
   }
 
   .glass-light-beam {
@@ -399,7 +399,7 @@
       .role-dialog,
       .dialog-note
     ) {
-    background: #17131d;
+    background: #000;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }

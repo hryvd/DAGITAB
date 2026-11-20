@@ -59,6 +59,17 @@ async function register(page, name, email, teamId) {
 try {
   const publicPage = await newPage();
   await publicPage.goto(base);
+  const logo = publicPage.locator('.logo-particle-canvas');
+  await publicPage
+    .locator('.logo-particle-canvas[data-animation-state="reduced"]')
+    .waitFor();
+  await publicPage.emulateMedia({ reducedMotion: 'no-preference' });
+  for (const state of ['assembling', 'revealing', 'formed']) {
+    await logo
+      .and(publicPage.locator(`[data-animation-state="${state}"]`))
+      .waitFor();
+  }
+  await publicPage.emulateMedia({ reducedMotion: 'reduce' });
   const header = await publicPage.locator('.site-header').boundingBox();
   const hero = await publicPage.locator('.hero').boundingBox();
   assert.equal(header.y, 0);
