@@ -13,16 +13,6 @@
   position: relative;
   isolation: isolate;
 }
-.portal::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at 5% 15%, #7c4abd13, transparent 38%),
-    radial-gradient(ellipse at 96% 65%, #d47a1911, transparent 35%);
-}
 .portal :is(h1, h2, h3, h4) {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 500;
@@ -226,12 +216,9 @@
   border-color: #ffffff50;
 }
 .portal .p-button.primary {
-  background: linear-gradient(115deg, #ffd390, #ffad43);
+  background: #ffbd65;
   border-color: #ffc775;
   color: #261707;
-  box-shadow:
-    inset 0 1px 0 #ffe7c2,
-    0 4px 16px #ff9d1a12;
 }
 .portal .p-button.primary:hover {
   background: #ffd394;
@@ -296,27 +283,9 @@
   border: 1px solid #ffffff19;
   border-radius: 16px;
   padding: 28px;
-  background: linear-gradient(145deg, #151218f2, #08080bf5 70%);
   transition:
     border-color 200ms,
     transform 200ms;
-}
-.portal .team-card::before {
-  content: '';
-  position: absolute;
-  left: -30%;
-  top: -135px;
-  width: 150%;
-  height: 240px;
-  border: 1px solid #ffb45222;
-  border-radius: 50%;
-  transform: rotate(-22deg);
-  pointer-events: none;
-  z-index: -1;
-}
-.portal .team-card:nth-child(even)::before {
-  border-color: #ba9dff2c;
-  transform: rotate(22deg);
 }
 .portal .team-card:hover {
   border-color: #ffb45218;
@@ -401,7 +370,6 @@
   gap: 36px;
   border: 1px solid #ba9dff2b;
   border-radius: 16px;
-  background: linear-gradient(100deg, #ba9dff0b, #ffb45206), #0b090ef2;
   padding: 30px 34px;
   margin-top: 32px;
 }
@@ -457,28 +425,11 @@
   line-height: 1.8;
 }
 #root .portal .auth-card {
-  background: linear-gradient(145deg, #19131ef2, #0d0b10f5 75%);
-  border: 1px solid transparent;
+  border: 1px solid var(--p-line);
   border-radius: 18px;
   padding: 34px;
   color: #f4eef9;
-  box-shadow: 0 20px 80px #0006;
   position: relative;
-}
-.portal .auth-card::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: 32px;
-  right: 32px;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #ffb452,
-    #c7aeef,
-    transparent
-  );
 }
 .portal .auth-card h2 {
   font-size: 28px;
@@ -571,7 +522,6 @@
   margin-top: 2px;
   color: #271c10;
   border-color: #e8ad56;
-  box-shadow: inset 0 1px 0 #ffdfa6;
 }
 .portal .auth-card fieldset {
   border: 0;
@@ -778,19 +728,8 @@
   border: 1px solid var(--p-line);
   border-radius: 12px;
   padding: 20px 22px;
-  background: #0f0c13f2;
   position: relative;
   overflow: hidden;
-}
-.stat-card::before {
-  content: '';
-  width: 54px;
-  height: 54px;
-  border: 1px solid #ffb4522b;
-  position: absolute;
-  right: -16px;
-  top: -24px;
-  border-radius: 50%;
 }
 .stat-card > span,
 .stat-card > p {
@@ -840,7 +779,6 @@
   padding: 24px;
   border: 1px solid var(--p-line);
   border-radius: 12px;
-  background: linear-gradient(135deg, #18121ff2, #0b090df5);
 }
 .portal .project-card h3 {
   font-size: 20px;
@@ -904,7 +842,6 @@
 }
 .task-card {
   border: 1px solid #ffffff20;
-  background: #151019f2;
   border-radius: 9px;
   padding: 16px;
   margin-bottom: 12px;
@@ -969,7 +906,6 @@
   display: grid;
   border: 1px solid var(--p-line);
   border-radius: 12px;
-  background: #0e0b12f2;
   overflow: hidden;
 }
 .member-row {
@@ -1017,7 +953,6 @@
 .team-setting {
   border: 1px solid var(--p-line);
   border-radius: 12px;
-  background: #110d16f2;
   padding: 24px;
   display: flex;
   flex-wrap: wrap;
@@ -1061,12 +996,10 @@
   width: min(540px, calc(100% - 32px));
   max-height: calc(100dvh - 48px);
   overflow-y: auto;
-  background: #141018f2;
   color: #f2edf8;
   border: 1px solid #6f547c;
   border-radius: 16px;
   padding: 28px;
-  box-shadow: 0 30px 120px #0009;
 }
 .portal .p-dialog::backdrop {
   background: #040206b3;
@@ -1130,36 +1063,21 @@
   background: var(--p-line);
   margin: 26px 0;
 }
-.portal
-  :is(
-    .auth-card,
-    .team-card,
-    .portal-banner,
-    .team-detail,
-    .stat-card,
-    .project-card,
-    .task-card,
-    .member-list,
-    .team-setting,
-    .p-dialog
-  ) {
-  border-color: transparent;
-  -webkit-backdrop-filter: blur(2px) saturate(1.05);
-  backdrop-filter: blur(2px) saturate(1.05);
-}
-#root .portal .registration-card {
-  background: linear-gradient(
-    145deg,
-    rgb(25 19 30 / 95%),
-    rgb(13 11 16 / 95%) 75%
-  );
-  --liquid-frost: blur(5px);
-  --liquid-backdrop: var(--liquid-frost);
+#root .portal [data-glass] {
+  background: var(--portal-pane-fill, rgb(18 15 22 / 62%));
   background-clip: padding-box;
-  border-color: rgb(225 204 255 / 22%);
-  box-shadow: var(--liquid-shadow);
+  border-color: var(--p-line);
+  box-shadow: none;
   -webkit-backdrop-filter: var(--liquid-backdrop);
   backdrop-filter: var(--liquid-backdrop);
+}
+.portal .registration-card {
+  --portal-pane-fill: rgb(18 15 22 / 95%);
+  --liquid-frost: blur(5px);
+  --liquid-backdrop: var(--liquid-frost);
+}
+.portal .p-dialog {
+  --portal-pane-fill: rgb(18 15 22 / 90%);
 }
 .portal .registration-card .auth-service-alert {
   margin-bottom: 24px;
@@ -1177,10 +1095,6 @@
   border-color: var(--p-gold-bright);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .portal .registration-card::before {
-    transform-origin: left;
-    animation: registration-highlight 360ms ease-out both;
-  }
   .portal .registration-card .expertise-options label {
     transition:
       background-color 160ms,
@@ -1188,31 +1102,8 @@
       color 160ms;
   }
 }
-@keyframes registration-highlight {
-  from {
-    opacity: 0;
-    transform: scaleX(0.25);
-  }
-  to {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
 @media (prefers-reduced-transparency: reduce) {
-  #root
-    .portal
-    :is(
-      .auth-card,
-      .team-card,
-      .portal-banner,
-      .team-detail,
-      .stat-card,
-      .project-card,
-      .task-card,
-      .member-list,
-      .team-setting,
-      .p-dialog
-    ) {
+  #root .portal [data-glass] {
     background: #131016;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -1369,9 +1260,8 @@
 #root .portal .team-detail {
   padding: 34px;
   margin: 30px 0;
-  border: 1px solid transparent;
+  border: 1px solid var(--p-line);
   border-radius: 16px;
-  background: linear-gradient(130deg, #ffb45209, #ba9dff08), #0b090ef2;
 }
 .team-detail > .p-button:first-child {
   margin-bottom: 32px;

@@ -59,7 +59,6 @@
     padding: 12px 20px max(22px, env(safe-area-inset-bottom, 0px));
     border-radius: 18px;
     --liquid-fill: rgb(13 10 22 / 78%);
-    --liquid-backdrop: blur(24px) saturate(1.35);
     -webkit-backdrop-filter: var(--liquid-backdrop);
     backdrop-filter: var(--liquid-backdrop);
   }

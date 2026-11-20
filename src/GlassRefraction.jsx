@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState } from 'react';
 
 const panes = [
   '[data-glass]',
-  '.registration-card',
   '.nav-wrap',
   '.mobile-nav',
   '.hero-bottom',
@@ -119,7 +118,7 @@ export default function GlassRefraction() {
       tracked.set(element, filter.id);
       element.style.setProperty(
         '--liquid-backdrop',
-        `url("#${filter.id}") var(--liquid-frost, blur(0.6px) saturate(1.15))`,
+        `url("#${filter.id}") var(--liquid-frost,)`,
       );
     }
 

@@ -764,18 +764,6 @@ function Modules() {
             return (
               <button
                 className="module-card"
-                onPointerMove={(event) => {
-                  if (event.pointerType === 'touch') return;
-                  const bounds = event.currentTarget.getBoundingClientRect();
-                  event.currentTarget.style.setProperty(
-                    '--spot-x',
-                    `${((event.clientX - bounds.left) / bounds.width) * 100}%`,
-                  );
-                  event.currentTarget.style.setProperty(
-                    '--spot-y',
-                    `${((event.clientY - bounds.top) / bounds.height) * 100}%`,
-                  );
-                }}
                 key={item.title}
                 onClick={() => setActiveRole(index)}
                 aria-haspopup="dialog"

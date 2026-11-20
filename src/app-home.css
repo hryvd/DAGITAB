@@ -16,10 +16,8 @@
   grid-template-columns: repeat(4, 1fr);
   padding: 5px 8px;
   width: min(400px, calc(100% - 24px));
-  background: rgb(12 11 15 / 91%);
-  box-shadow:
-    0 6px 25px #0009,
-    inset 0 1px 0 #f4d8ff22;
+  background: rgb(12 11 15 / 72%);
+  box-shadow: var(--liquid-shadow);
 }
 .hub-dock a {
   position: relative;
@@ -45,7 +43,6 @@
   width: 22px;
   border-radius: 2px;
   background: currentColor;
-  box-shadow: 0 -1px 9px #ffbc5b56;
 }
 .builder-hub a:focus-visible {
   outline: 3px solid #ffdb9d;

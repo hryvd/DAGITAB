@@ -241,7 +241,7 @@ function Teams({ teams, selectedId, user, directory = '/teams' }) {
           <Constellation />
         </div>
       </div>
-      <div className="portal-banner">
+      <div className="portal-banner" data-glass>
         <div className="portal-banner-copy">
           <Sparkles size={22} />
           <div>
@@ -255,7 +255,11 @@ function Teams({ teams, selectedId, user, directory = '/teams' }) {
         </div>
       </div>
       {selected && (
-        <section className="team-detail" aria-labelledby="team-detail-title">
+        <section
+          className="team-detail"
+          data-glass
+          aria-labelledby="team-detail-title"
+        >
           <a className="p-button secondary small" href={directory}>
             <ArrowLeft size={15} /> All teams
           </a>
@@ -292,7 +296,7 @@ function Teams({ teams, selectedId, user, directory = '/teams' }) {
         {teams.map((team, index) => {
           const Icon = teamIcons[team.id] || Users;
           return (
-            <article className="team-card" key={team.id}>
+            <article className="team-card" data-glass key={team.id}>
               <div className="team-card-top">
                 <span className="team-icon">
                   <Icon size={24} />
@@ -442,6 +446,7 @@ function Auth({ mode, teams, setSession, user, serviceError, onRetry }) {
       </aside>
       <section
         className={registering ? 'auth-card registration-card' : 'auth-card'}
+        data-glass
         aria-labelledby="auth-title"
       >
         {!admin && (
@@ -738,6 +743,7 @@ function Editor({ kind, data, user, initialTeamId, onClose, onSave }) {
   return (
     <dialog
       className="p-dialog portal"
+      data-glass
       ref={ref}
       onCancel={onClose}
       aria-labelledby={titleId}
@@ -888,7 +894,7 @@ function TeamSetting({ team, refresh }) {
     }
   }
   return (
-    <form className="team-setting" onSubmit={save}>
+    <form className="team-setting" data-glass onSubmit={save}>
       <div>
         <h3>{team.name}</h3>
         <p className="form-help">{team.memberCount} registered builders</p>
@@ -1055,12 +1061,12 @@ function Dashboard({ user }) {
           </button>
         </div>
         <div className="workspace-stats">
-          <div className="stat-card">
+          <div className="stat-card" data-glass>
             <span>TEAM PROJECTS</span>
             <strong>{projects.length.toString().padStart(2, '0')}</strong>
             <LayoutDashboard size={20} />
           </div>
-          <div className="stat-card">
+          <div className="stat-card" data-glass>
             <span>IN PROGRESS</span>
             <strong>
               {tasks
@@ -1070,7 +1076,7 @@ function Dashboard({ user }) {
             </strong>
             <Orbit size={20} />
           </div>
-          <div className="stat-card">
+          <div className="stat-card" data-glass>
             <span>COMPLETED TASKS</span>
             <strong>{completed.toString().padStart(2, '0')}</strong>
             <CheckCircle2 size={20} />
@@ -1151,7 +1157,7 @@ function Dashboard({ user }) {
                   {tasks
                     .filter((t) => t.status === status)
                     .map((task) => (
-                      <article className="task-card" key={task.id}>
+                      <article className="task-card" data-glass key={task.id}>
                         <p className="task-project">
                           {
                             data.projects.find((p) => p.id === task.projectId)
@@ -1236,7 +1242,7 @@ function Dashboard({ user }) {
                   ),
                   done = projectTasks.filter((t) => t.status === 'done').length;
                 return (
-                  <article className="project-card" key={project.id}>
+                  <article className="project-card" data-glass key={project.id}>
                     <div className="project-meta">
                       <span className="p-badge purple">
                         {teamName(teams, project.teamId)}
@@ -1314,7 +1320,7 @@ function Dashboard({ user }) {
             />
           ))}
         {tab === 'members' && (
-          <div className="member-list">
+          <div className="member-list" data-glass>
             {members.map((member) => (
               <article className="member-row" key={member.id}>
                 <span className="member-avatar">
